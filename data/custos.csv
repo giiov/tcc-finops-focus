@@ -1,0 +1,11 @@
+servico,categoria,custo,data,regiao,provedor
+EC2,Computação,320.50,2026-05-01,us-east-1,AWS
+S3,Armazenamento,89.90,2026-05-01,us-east-1,AWS
+Lambda,Serverless,45.30,2026-05-01,us-west-2,AWS
+RDS,Banco de Dados,210.00,2026-05-02,sa-east-1,AWS
+Cloud Functions,Serverless,38.50,2026-05-02,southamerica-east1,GCP
+Virtual Machines,Computação,410.20,2026-05-03,brazilsouth,Azure
+Blob Storage,Armazenamento,120.75,2026-05-03,brazilsouth,Azure
+BigQuery,Analytics,185.40,2026-05-04,us-central1,GCP
+CloudFront,CDN,67.80,2026-05-04,global,AWS
+Azure SQL,Banco de Dados,299.99,2026-05-05,eastus,Azure
