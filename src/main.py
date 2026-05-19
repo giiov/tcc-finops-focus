@@ -6,4 +6,4 @@ import pandas as pd
 
 dados = pd.read_csv("data/custos.csv")
 
-print(dados)
+print(dados) # python src/main.py -> no terminal
