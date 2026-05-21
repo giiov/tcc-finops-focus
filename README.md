@@ -46,5 +46,4 @@ TCC-FINOPS-FOCUS/
 * Suporte para Azure
 * Suporte para Google Cloud
 * Detector automático de provedor
-* Interface visual
 * Dashboard FinOps
