@@ -1,16 +1,24 @@
 AWS_MAPPING = {
-    "identity/LineItemId": "ChargeId",
+    #Descrição e Período de Cobrança
     "lineItem/LineItemDescription": "ChargeDescription",
     "lineItem/UsageStartDate": "ChargePeriodStart",
     "lineItem/UsageEndDate": "ChargePeriodEnd",
+    "lineItem/LineItemType": "ChargeCategory",
+
+    #Contas de Faturamento e Entidades
     "bill/PayerAccountId": "BillingAccountId",
     "lineItem/UsageAccountId": "SubAccountId",
-    "lineItem/LineItemType": "ChargeCategory",
+    "bill/BillingEntity": "PublisherName",
+
+    #Custos e Moeda
     "lineItem/UnblendedCost": "BilledCost",
     "pricing/publicOnDemandCost": "EffectiveCost",
-    "bill/BillingEntity": "BillingCurrency",
+    "lineItem/CurrencyCode": "BillingCurrency",
+
+    #Serviços e Recursos
     "lineItem/ResourceId": "ResourceId",
-    "product/instanceType": "ResourceType",
     "product/ProductName": "ServiceName",
+
+    #Etiquetas (Tags)
     "resourceTags/user:Environment": "Tags"
 }

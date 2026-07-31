@@ -13,12 +13,27 @@ def converter_aws():
     #leitura 
     df = pd.read_csv(caminho_entrada)
 
+    #Tratamento dinâmico do ResourceType
+    if "product/instanceType" in df.columns and "product/productFamily" in df.columns:
+        df["ResourceType"] = df["product/instanceType"].fillna(df["product/productFamily"])
+    elif "product/instanceType" in df.columns:
+        df["ResourceType"] = df["product/instanceType"].fillna(df.get("lineItem/ProductCode", "General"))
+    elif "product/productFamily" in df.columns:
+        df["ResourceType"] = df["product/productFamily"]
+    else:
+        df["ResourceType"] = "General"
+
     #renomeando colunas
     df = df.rename(columns=AWS_MAPPING)
 
     #criando tabelas que não existem no CUR
     df["ProviderName"] = "AWS"
-    df["PublisherName"] = "AWS"
+
+    # Garante que se o PublisherName estiver vazio/NaN, assume "Amazon Web Services"
+    if "PublisherName" in df.columns:
+        df["PublisherName"] = df["PublisherName"].fillna("Amazon Web Services")
+    else:
+        df["PublisherName"] = "Amazon Web Services"
 
     #manter apenas colunas focus
     df_focus = df[COLUNAS_OFICIAIS_FOCUS]
