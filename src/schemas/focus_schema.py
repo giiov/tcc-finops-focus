@@ -1,5 +1,5 @@
 COLUNAS_OFICIAIS_FOCUS = [
-"ChargeId", "ChargeDescription", "ChargePeriodStart",
+"ChargeDescription", "ChargePeriodStart",
 "ChargePeriodEnd",
 "ProviderName", "PublisherName", "BillingAccountId",
 "SubAccountId",
