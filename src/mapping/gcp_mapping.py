@@ -8,8 +8,7 @@ GCP_MAPPING = {
     "billing_account_id": "BillingAccountId",
     "project.id": "SubAccountId",
 
-    #Custos e Moeda
-    "cost": "BilledCost",
+    #Moeda
     "currency": "BillingCurrency",
 
     #Serviços e Recursos
