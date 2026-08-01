@@ -81,8 +81,31 @@ def converter_gcp():
     if "EffectiveCost" not in df.columns:
         df["EffectiveCost"] = df["BilledCost"]
 
-    # 4. Tags (Estrutura JSON padrão)
-    df["Tags"] = '{"Environment": "Untagged"}'
+    #Tags (Estrutura JSON padrão)
+    # No GCP, labels vêm como texto JSON, ex: '[{"key": "environment", "value": "production"}]'
+    # ou "[]" quando o recurso não tem nenhuma label
+    def converter_labels_para_tags(labels_raw):
+        # Caso não haja labels (célula vazia, NaN ou "[]")
+        if pd.isna(labels_raw) or str(labels_raw).strip() in ("", "[]"):
+            return json.dumps({})
+
+        try:
+            lista_labels = json.loads(labels_raw)
+        except (json.JSONDecodeError, TypeError):
+            return json.dumps({})
+
+        #monta o dicionário {key: value} a partir da lista de labels do GCP
+        dicionario_tags = {
+            item["key"]: item["value"]
+            for item in lista_labels
+            if isinstance(item, dict) and "key" in item and "value" in item
+        }
+        return json.dumps(dicionario_tags)
+
+    if "labels" in df.columns:
+        df["Tags"] = df["labels"].apply(converter_labels_para_tags)
+    else:
+        df["Tags"] = json.dumps({})
 
     #mantendo apenas as colunas oficiais do FOCUS
     #caso alguma coluna não exista, será criada sozinha
@@ -96,4 +119,9 @@ def converter_gcp():
     #exporta o arquivo convertido
     df_focus.to_csv(caminho_saida, index=False)
 
-    print("COnverrsão GCP -> FOCUS concluída com sucesso")
+    print("Conversão GCP -> FOCUS concluída com sucesso")
+
+#Permite rodar este arquivo isoladamente (python -m src.converters.gcp_converter) para testes,
+#sem executar a conversão automaticamente quando o arquivo for importado por outro script (ex: main.py)
+if __name__ == "__main__":
+    converter_gcp()
