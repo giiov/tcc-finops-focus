@@ -1,0 +1,8 @@
+ChargeDescription,ChargePeriodStart,ChargePeriodEnd,ProviderName,PublisherName,BillingAccountId,SubAccountId,ChargeCategory,BilledCost,EffectiveCost,BillingCurrency,ResourceId,ResourceType,ServiceName,Tags
+EC2 instance running,2026-05-01T00:00:00Z,2026-05-01T23:59:59Z,AWS,AWS,123456789012,210987654321,Usage,320.5,350.0,,i-0abc123def456,t3.micro,Amazon Elastic Compute Cloud,Production
+S3 storage usage,2026-05-01T00:00:00Z,2026-05-01T23:59:59Z,AWS,AWS,123456789012,210987654321,Usage,89.9,95.0,,bucket-backup,General,Amazon Simple Storage Service,Backup
+Sales tax on EC2 usage,2026-05-01T00:00:00Z,2026-05-01T23:59:59Z,AWS,AWS,123456789012,210987654321,Tax,28.85,28.85,,i-0abc123def456,t3.micro,Amazon Elastic Compute Cloud,Production
+Reserved Instance upfront fee,2026-05-01T00:00:00Z,2026-05-01T23:59:59Z,AWS,AWS,123456789012,210987654321,Purchase,150.0,150.0,,db-prod-rds-01,db.t3.micro,Amazon Relational Database Service,Production
+Promotional credit applied,2026-05-02T00:00:00Z,2026-05-02T23:59:59Z,AWS,AWS,123456789012,210987654321,Credit,-25.0,0.0,,lambda-user-auth,General,AWS Lambda,Development
+Volume discount adjustment,2026-05-03T00:00:00Z,2026-05-03T23:59:59Z,AWS,AWS,123456789012,210987654321,Adjustment,-12.4,0.0,,distribution-CF01,General,Amazon CloudFront,CDN
+Refund for billing error,2026-05-04T00:00:00Z,2026-05-04T23:59:59Z,AWS,AWS,123456789012,210987654321,Credit,-8.0,0.0,,bucket-backup,General,Amazon Simple Storage Service,Backup

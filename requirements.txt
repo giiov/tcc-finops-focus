@@ -1,0 +1,6 @@
+pandas
+matplotlib
+seaborn
+
+#rodar esse comando no terminal:
+#pip install -r requirements.txt 
