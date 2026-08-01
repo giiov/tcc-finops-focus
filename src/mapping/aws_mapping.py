@@ -3,7 +3,6 @@ AWS_MAPPING = {
     "lineItem/LineItemDescription": "ChargeDescription",
     "lineItem/UsageStartDate": "ChargePeriodStart",
     "lineItem/UsageEndDate": "ChargePeriodEnd",
-    "lineItem/LineItemType": "ChargeCategory",
 
     #Contas de Faturamento e Entidades
     "bill/PayerAccountId": "BillingAccountId",

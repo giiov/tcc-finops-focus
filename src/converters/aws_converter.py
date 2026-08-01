@@ -26,6 +26,30 @@ def converter_aws():
     #renomeando colunas
     df = df.rename(columns=AWS_MAPPING)
 
+    #tratando categoria de cobrança
+    #o CUR AWS tem uma coluna "lineItem/LineItemType" com vários valores possíveis 
+    #vamos traduzir cada um pro valor equivalente que o FOCUS espera
+    MAPA_CHARGE_CATEGORY = {
+        "Usage": "Usage",
+        "DiscountedUsage": "Usage",
+        "SavingsPlanCoveredUsage": "Usage",
+        "Tax": "Tax",
+        "Fee": "Purchase",
+        "RIFee": "Purchase",
+        "SavingsPlanUpfrontFee": "Purchase",
+        "SavingsPlanRecurringFee": "Purchase",
+        "Credit": "Credit",
+        "Refund": "Credit",
+        "Discount": "Adjustment",
+        "SavingsPlanNegation": "Adjustment",
+    }
+
+    if "lineItem/LineItemType" in df.columns:
+        df["ChargeCategory"] = df["lineItem/LineItemType"].map(MAPA_CHARGE_CATEGORY)
+        df["ChargeCategory"] = df["ChargeCategory"].fillna("Usage")
+    else:
+        df["ChargeCategory"] = "Usage"
+        
     #criando tabelas que não existem no CUR
     df["ProviderName"] = "AWS"
 
@@ -34,6 +58,12 @@ def converter_aws():
         df["PublisherName"] = df["PublisherName"].fillna("Amazon Web Services")
     else:
         df["PublisherName"] = "Amazon Web Services"
+
+    #garante que todas as colunas obrigatórias do focus existam
+    #mesmo que a fonte não tenha esse dado, fica como vazio/none
+    for coluna in COLUNAS_OFICIAIS_FOCUS:
+        if coluna not in df.columns:
+            df[coluna] = None
 
     #manter apenas colunas focus
     df_focus = df[COLUNAS_OFICIAIS_FOCUS]
