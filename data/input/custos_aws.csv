@@ -1,0 +1,6 @@
+identity/LineItemId,lineItem/LineItemDescription,lineItem/UsageStartDate,lineItem/UsageEndDate,bill/PayerAccountId,lineItem/UsageAccountId,lineItem/LineItemType,lineItem/UnblendedCost,pricing/publicOnDemandCost,bill/BillingEntity,lineItem/ResourceId,product/instanceType,product/ProductName,resourceTags/user:Environment
+1,EC2 instance running,2026-05-01T00:00:00Z,2026-05-01T23:59:59Z,123456789012,210987654321,Usage,320.50,350.00,AWS,i-0abc123def456,t3.micro,Amazon Elastic Compute Cloud,Production
+2,S3 storage usage,2026-05-01T00:00:00Z,2026-05-01T23:59:59Z,123456789012,210987654321,Usage,89.90,95.00,AWS,bucket-backup,,Amazon Simple Storage Service,Backup
+3,Lambda execution,2026-05-02T00:00:00Z,2026-05-02T23:59:59Z,123456789012,210987654321,Usage,45.30,50.00,AWS,lambda-user-auth,,AWS Lambda,Development
+4,RDS database usage,2026-05-03T00:00:00Z,2026-05-03T23:59:59Z,123456789012,210987654321,Usage,210.00,240.00,AWS,db-prod-rds-01,db.t3.micro,Amazon Relational Database Service,Production
+5,CloudFront transfer,2026-05-04T00:00:00Z,2026-05-04T23:59:59Z,123456789012,210987654321,Usage,67.80,70.00,AWS,distribution-CF01,,Amazon CloudFront,CDN
