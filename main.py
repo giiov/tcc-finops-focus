@@ -1,10 +1,10 @@
-from src.converters.gcp_converter import converter_gcp
+from src.converters.aws_converter import converter_aws
 
 def main ():
     print("Iniciando conversão...")
 
     try:
-        converter_gcp()
+        converter_aws()
 
         print("Conversão concluída")
 

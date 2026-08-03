@@ -121,7 +121,5 @@ def converter_gcp():
 
     print("Conversão GCP -> FOCUS concluída com sucesso")
 
-#Permite rodar este arquivo isoladamente (python -m src.converters.gcp_converter) para testes,
-#sem executar a conversão automaticamente quando o arquivo for importado por outro script (ex: main.py)
 if __name__ == "__main__":
     converter_gcp()
