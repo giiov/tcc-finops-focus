@@ -8,7 +8,7 @@ from src.schemas.focus_schema import COLUNAS_OFICIAIS_FOCUS
 
 def converter_aws():
     caminho_entrada = "data/input/custos_aws.csv"
-    caminho_saida = "data/output/focus_padronizado"
+    caminho_saida = "data/output/focus_padronizado_aws"
 
     #leitura 
     df = pd.read_csv(caminho_entrada)
