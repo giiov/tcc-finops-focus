@@ -4,6 +4,7 @@ import streamlit as st
 from src.mapping.detector import detectar_formato
 from src.converters.aws_converter import converter_aws
 from src.converters.gcp_converter import converter_gcp
+from src.visualization.dashboard import grafico_custos_por_servico
 
 st.title("Conversor de Custos Cloud -> FOCUS")
 
@@ -34,6 +35,10 @@ if arquivo_enviado is not None:
 
         #mostra o resultado como tabela na própria página
         st.dataframe(df_focus)
+
+        #exibe o gráfico de custos por serviço
+        fig = grafico_custos_por_servico(df_focus)
+        st.plotly_chart(fig, use_container_width=True)
 
         #permite baixar o CSV padronizado
         csv_bytes = df_focus.to_csv(index=False).encode("utf-8")
