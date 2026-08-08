@@ -1,17 +1,12 @@
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 import json
 
 from src.mapping.gcp_mapping import GCP_MAPPING
 from src.schemas.focus_schema import COLUNAS_OFICIAIS_FOCUS
 
-def converter_gcp():
-    caminho_entrada = "data/input/custos_gcp.csv"
-    caminho_saida = "data/output/focus_padronizado_gcp.csv"
-
-    #leitura 
-    df = pd.read_csv(caminho_entrada)
+def converter_gcp(caminho_arquivo):
+    #leitura
+    df = pd.read_csv(caminho_arquivo)
     
         #renomeando colunas
     df = df.rename(columns=GCP_MAPPING)
@@ -116,10 +111,9 @@ def converter_gcp():
     #organiza as colunas na ordem oficial do FOCUS
     df_focus = df[COLUNAS_OFICIAIS_FOCUS]
 
-    #exporta o arquivo convertido
-    df_focus.to_csv(caminho_saida, index=False)
-
-    print("Conversão GCP -> FOCUS concluída com sucesso")
+    #devolve o dataframe jpa padronizado
+    return df_focus
 
 if __name__ == "__main__":
-    converter_gcp()
+    resultado = converter_gcp("data/input/custos_gcp.csv")
+    print (resultado.head())
