@@ -7,6 +7,11 @@ AZURE_MAPPING = {
     # Contas
     "BillingProfileId": "BillingAccountId",
     "BillingProfileName": "BillingAccountName",
+    "SubscriptionId": "SubAccountId",
+
+    # Recursos
+    "ResourceId": "ResourceId",
+    "ResourceType": "ResourceType",
 
     # Moeda
     "BillingCurrency": "BillingCurrency",
