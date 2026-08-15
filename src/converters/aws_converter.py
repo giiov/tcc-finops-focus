@@ -18,6 +18,16 @@ def converter_aws(caminho_arquivo):
     else:
         df["ResourceType"] = "General"
 
+    #Tratamento dinâmico do ResourceType
+    if "product/instanceType" in df.columns and "product/productFamily" in df.columns:
+        df["ResourceType"] = df["product/instanceType"].fillna(df["product/productFamily"])
+    elif "product/instanceType" in df.columns:
+        df["ResourceType"] = df["product/instanceType"].fillna(df.get("lineItem/ProductCode", "General"))
+    elif "product/productFamily" in df.columns:
+        df["ResourceType"] = df["product/productFamily"]
+    else:
+        df["ResourceType"] = "General"
+
     #renomeando colunas
     df = df.rename(columns=AWS_MAPPING)
 
