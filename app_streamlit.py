@@ -4,6 +4,7 @@ import streamlit as st
 from src.mapping.detector import detectar_formato
 from src.converters.aws_converter import converter_aws
 from src.converters.gcp_converter import converter_gcp
+from src.converters.azure_converter import converter_azure
 from src.visualization.dashboard import grafico_custos_por_servico
 
 st.title("Conversor de Custos Cloud -> FOCUS")
@@ -30,6 +31,8 @@ if arquivo_enviado is not None:
             df_focus = converter_gcp(caminho_arquivo)
         elif formato == "aws":
             df_focus = converter_aws(caminho_arquivo)
+        elif formato == "azure":
+            df_focus = converter_azure(caminho_arquivo)
 
         st.success("Conversão concluída!")
 
