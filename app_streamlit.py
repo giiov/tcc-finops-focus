@@ -33,11 +33,12 @@ st.markdown(
     html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
     .focus-titulo {
-        font-size: 2.2rem;
+        font-size: 3rem !important;
         font-weight: 800;
         letter-spacing: -0.03em;
         color: #e2e8f0;
         margin: 0;
+        line-height: 1.1;
     }
     .focus-titulo .destaque {
         background: linear-gradient(90deg, #38bdf8, #22d3ee);
@@ -45,7 +46,33 @@ st.markdown(
         background-clip: text;
         color: transparent;
     }
-    .focus-subtitulo { color: #94a3b8; font-size: 0.95rem; margin-top: 2px; }
+    .focus-subtitulo {
+        color: #94a3b8;
+        font-size: 0.95rem;
+        margin: 2px 0 0 0;
+    }
+    .focus-icone {
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        width: 3rem;
+        height: 3rem;
+        color: #38bdf8;
+        flex-shrink: 0;
+        margin-top: 0.38rem;
+    }
+    .focus-icone svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+    .focus-texto {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        gap: 0;
+    }
 
     [data-testid="stFileUploaderDropzone"] {
         border: 1.5px dashed #1d4ed8;
@@ -54,11 +81,67 @@ st.markdown(
 
     [data-testid="stMetric"] {
         background: #111827;
-        border: 1px solid #1e293b;
-        border-radius: 10px;
+        border: 1px solid rgba(30, 41, 59, 0.95);
+        border-radius: 14px;
         padding: 12px 14px;
+        box-shadow: 0 0 0 rgba(56, 189, 248, 0);
+        transition: box-shadow 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+    }
+    [data-testid="stMetric"]:hover {
+        box-shadow: 0 0.75rem 1.5rem rgba(56, 189, 248, 0.14);
+        border-color: rgba(56, 189, 248, 0.8);
+        transform: translateY(-2px);
     }
     [data-testid="stMetricValue"] { color: #38bdf8; font-weight: 700; }
+
+    .focus-alert-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(2, 6, 23, 0.72);
+        backdrop-filter: blur(2px);
+    }
+    .focus-alert {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        width: min(520px, calc(100vw - 32px));
+        padding: 18px 20px;
+        border: 1px solid rgba(56, 189, 248, 0.55);
+        border-left: 5px solid #38bdf8;
+        border-radius: 14px;
+        background: rgba(15, 23, 42, 0.96);
+        box-shadow: 0 20px 45px rgba(14, 116, 144, 0.26);
+        color: #e2e8f0;
+    }
+    .focus-alert-texto {
+        font-size: 0.98rem;
+        line-height: 1.5;
+        color: #e2e8f0;
+    }
+    .focus-alert-texto strong {
+        color: #38bdf8;
+    }
+    .focus-alert button {
+        background: #38bdf8;
+        color: #08111d;
+        border: none;
+        border-radius: 8px;
+        padding: 9px 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+        box-shadow: 0 4px 10px rgba(56, 189, 248, 0.2);
+        flex-shrink: 0;
+    }
+    .focus-alert button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 18px rgba(56, 189, 248, 0.28);
+    }
 
     .stTabs [data-baseweb="tab"] { font-weight: 600; }
     .stTabs [aria-selected="true"] { color: #38bdf8 !important; }
@@ -76,9 +159,9 @@ st.markdown(
 #--- cabecalho, sempre visivel ---
 st.markdown(
     f"""
-    <div style="display:flex;align-items:center;gap:14px;padding:4px 0 12px;">
-        <div style="color:#38bdf8;">{ICONE_NUVEM}</div>
-        <div>
+    <div style="display:flex;align-items:flex-start;gap:14px;padding:4px 0 12px;">
+        <div class="focus-icone">{ICONE_NUVEM}</div>
+        <div class="focus-texto">
             <p class="focus-titulo"><span class="destaque">FOCUS</span> Multi-Cloud</p>
             <p class="focus-subtitulo">Padronização e análise de custos AWS, GCP e Azure em um único padrão</p>
         </div>
@@ -144,18 +227,31 @@ if arquivo_enviado is not None:
                 with st.expander("Sem dado nesta fonte"):
                     st.caption(", ".join(colunas_ausentes))
 
-        st.success(f"Formato detectado: {formato.upper()} — conversão concluída")
+        st.markdown(
+            f"""
+            <div id="focus-alert-overlay" class="focus-alert-overlay">
+                <div class="focus-alert">
+                    <div class="focus-alert-texto">
+                        <strong>Formato detectado:</strong> {formato.upper()}<br>
+                        Conversão concluída
+                    </div>
+                    <button type="button" onclick="document.getElementById('focus-alert-overlay').style.display='none';">OK</button>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
         #--- resumo geral (KPIs) logo no topo, antes de abrir as abas ---
         kpis = calcular_kpis(df_focus)
-        col_a, col_b, col_c, col_d = st.columns(4)
-        col_a.metric("Registros", kpis["registros"])
-        if kpis["total_faturado"] is not None:
-            col_b.metric("Total faturado", f"${kpis['total_faturado']:,.2f}")
+        col_efetivo, col_faturado, col_economia = st.columns([2.5, 1.25, 1.25])
+
         if kpis["total_efetivo"] is not None:
-            col_c.metric("Total efetivo", f"${kpis['total_efetivo']:,.2f}")
+            col_efetivo.metric("Total efetivo", f"${kpis['total_efetivo']:,.2f}")
+        if kpis["total_faturado"] is not None:
+            col_faturado.metric("Total faturado", f"${kpis['total_faturado']:,.2f}")
         if kpis["economia"] is not None:
-            col_d.metric("Economia", f"${kpis['economia']:,.2f}", f"{kpis['economia_pct']:.1f}%")
+            col_economia.metric("Economia", f"${kpis['economia']:,.2f}", f"{kpis['economia_pct']:.1f}%")
 
         aba_dados, aba_graficos = st.tabs(["Dados", "Visualizações"])
 
