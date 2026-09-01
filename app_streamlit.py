@@ -1,5 +1,6 @@
 import os
 import streamlit as st
+import streamlit.components.v1 as components
 
 from src.mapping.detector import detectar_formato
 from src.converters.aws_converter import converter_aws
@@ -94,51 +95,64 @@ st.markdown(
     }
     [data-testid="stMetricValue"] { color: #38bdf8; font-weight: 700; }
 
-    .focus-alert-overlay {
+    #focus-overlay {
+        display: none;
         position: fixed;
-        inset: 0;
-        z-index: 9999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(2, 6, 23, 0.72);
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(2, 6, 23, 0.72);
         backdrop-filter: blur(2px);
+        z-index: 999;
     }
-    .focus-alert {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 18px;
-        width: min(520px, calc(100vw - 32px));
-        padding: 18px 20px;
-        border: 1px solid rgba(56, 189, 248, 0.55);
-        border-left: 5px solid #38bdf8;
+
+    #focus-alert-box {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(15, 23, 42, 0.97);
+        padding: 20px 26px;
         border-radius: 14px;
-        background: rgba(15, 23, 42, 0.96);
-        box-shadow: 0 20px 45px rgba(14, 116, 144, 0.26);
-        color: #e2e8f0;
+        box-shadow: 0 18px 36px rgba(14, 116, 144, 0.25);
+        text-align: left;
+        min-width: 320px;
+        border: 1px solid rgba(56, 189, 248, 0.5);
+        border-left: 5px solid #38bdf8;
     }
+
+    #focus-alert-box h3 {
+        margin: 0 0 10px 0;
+        color: #e2e8f0;
+        font-size: 1.1rem;
+    }
+
     .focus-alert-texto {
-        font-size: 0.98rem;
+        margin: 0;
+        font-size: 0.96rem;
         line-height: 1.5;
         color: #e2e8f0;
     }
+
     .focus-alert-texto strong {
         color: #38bdf8;
     }
-    .focus-alert button {
-        background: #38bdf8;
+
+    #focus-alert-box button {
+        margin-top: 16px;
+        padding: 8px 16px;
+        background-color: #38bdf8;
         color: #08111d;
         border: none;
-        border-radius: 8px;
-        padding: 9px 16px;
-        font-weight: 700;
+        border-radius: 6px;
         cursor: pointer;
-        transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+        font-weight: 700;
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
         box-shadow: 0 4px 10px rgba(56, 189, 248, 0.2);
-        flex-shrink: 0;
     }
-    .focus-alert button:hover {
+
+    #focus-alert-box button:hover {
         transform: translateY(-1px);
         box-shadow: 0 8px 18px rgba(56, 189, 248, 0.28);
     }
@@ -227,20 +241,16 @@ if arquivo_enviado is not None:
                 with st.expander("Sem dado nesta fonte"):
                     st.caption(", ".join(colunas_ausentes))
 
-        st.markdown(
-            f"""
-            <div id="focus-alert-overlay" class="focus-alert-overlay">
-                <div class="focus-alert">
-                    <div class="focus-alert-texto">
-                        <strong>Formato detectado:</strong> {formato.upper()}<br>
-                        Conversão concluída
-                    </div>
-                    <button type="button" onclick="document.getElementById('focus-alert-overlay').style.display='none';">OK</button>
-                </div>
+        alert_html = f"""
+        <div id="focus-overlay" style="display:block;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(2,6,23,0.72);z-index:9999;backdrop-filter:blur(2px);">
+            <div id="focus-alert-box" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(15,23,42,0.97);padding:20px 26px;border-radius:14px;box-shadow:0 18px 36px rgba(14,116,144,0.25);min-width:320px;border:1px solid rgba(56,189,248,0.5);border-left:5px solid #38bdf8;">
+                <h3 style="margin:0 0 10px 0;color:#e2e8f0;font-size:1.1rem;">Conversão concluída</h3>
+                <p style="margin:0 0 16px 0;font-size:0.96rem;line-height:1.5;color:#e2e8f0;"><strong style="color:#38bdf8;">Formato detectado:</strong> {formato.upper()}</p>
+                <button type="button" onclick="document.getElementById('focus-overlay').style.display='none';" style="padding:8px 16px;background:#38bdf8;color:#08111d;border:none;border-radius:6px;cursor:pointer;font-weight:700;box-shadow:0 4px 10px rgba(56,189,248,0.2);">OK</button>
             </div>
-            """,
-            unsafe_allow_html=True,
-        )
+        </div>
+        """
+        components.html(alert_html, height=760, scrolling=False)
 
         #--- resumo geral (KPIs) logo no topo, antes de abrir as abas ---
         kpis = calcular_kpis(df_focus)
