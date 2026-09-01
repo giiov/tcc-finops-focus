@@ -1,3 +1,4 @@
+import html
 import os
 import streamlit as st
 import streamlit.components.v1 as components
@@ -95,68 +96,6 @@ st.markdown(
     }
     [data-testid="stMetricValue"] { color: #38bdf8; font-weight: 700; }
 
-    #focus-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(2, 6, 23, 0.72);
-        backdrop-filter: blur(2px);
-        z-index: 999;
-    }
-
-    #focus-alert-box {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(15, 23, 42, 0.97);
-        padding: 20px 26px;
-        border-radius: 14px;
-        box-shadow: 0 18px 36px rgba(14, 116, 144, 0.25);
-        text-align: left;
-        min-width: 320px;
-        border: 1px solid rgba(56, 189, 248, 0.5);
-        border-left: 5px solid #38bdf8;
-    }
-
-    #focus-alert-box h3 {
-        margin: 0 0 10px 0;
-        color: #e2e8f0;
-        font-size: 1.1rem;
-    }
-
-    .focus-alert-texto {
-        margin: 0;
-        font-size: 0.96rem;
-        line-height: 1.5;
-        color: #e2e8f0;
-    }
-
-    .focus-alert-texto strong {
-        color: #38bdf8;
-    }
-
-    #focus-alert-box button {
-        margin-top: 16px;
-        padding: 8px 16px;
-        background-color: #38bdf8;
-        color: #08111d;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: 700;
-        transition: transform 0.18s ease, box-shadow 0.18s ease;
-        box-shadow: 0 4px 10px rgba(56, 189, 248, 0.2);
-    }
-
-    #focus-alert-box button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 8px 18px rgba(56, 189, 248, 0.28);
-    }
-
     .stTabs [data-baseweb="tab"] { font-weight: 600; }
     .stTabs [aria-selected="true"] { color: #38bdf8 !important; }
 
@@ -164,6 +103,70 @@ st.markdown(
         font-size: 0.85rem;
         color: #94a3b8;
         line-height: 1.5;
+        margin: 0;
+    }
+
+    .sidebar-card {
+        background: rgba(15, 23, 42, 0.82);
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        border-radius: 12px;
+        padding: 1rem 10rem;
+        margin: 0 0 10px;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+    }
+    .sidebar-card--compact {
+        padding: 10px 12px;
+    }
+    .sidebar-card__label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #cbd5e1;
+        margin-bottom: 0.05rem;
+    }
+    .sidebar-card__value {
+        font-size: clamp(1.2rem, 2vw, 2.2rem);
+        line-height: 1.1;
+        font-weight: 800;
+        color: #38bdf8;
+        word-break: break-word;
+    }
+    .sidebar-card--provider .sidebar-card__value {
+        color: #7dd3fc;
+    }
+    .sidebar-card--records .sidebar-card__value {
+        color: #67e8f9;
+    }
+    .focus-columns-list {
+        list-style: disc;
+        margin: 0 0 1rem 0;
+        padding-left: 1.1rem;
+        column-count: 2;
+        column-gap: 1.2rem;
+        width: 100%;
+        text-align: left;
+        align-items: flex-start;
+        justify-content: flex-start;
+    }
+    .focus-columns-list li {
+        display: list-item;
+        break-inside: avoid;
+        margin: 0 0 0.35rem;
+        padding: 0;
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        color: #e2e8f0;
+        font-size: 0.74rem;
+        line-height: 1.3;
+        white-space: normal;
+        text-align: left;
+    }
+    .focus-columns-list li.missing {
+        background: transparent;
+        border: none;
+        color: #94a3b8;
     }
     </style>
     """,
@@ -230,27 +233,48 @@ if arquivo_enviado is not None:
             st.markdown(_com_icone(ICONE_CAMADAS, "DATASET ATUAL"), unsafe_allow_html=True)
 
             provedores = df_focus["ProviderName"].dropna().unique().tolist()
-            st.metric("Provedor(es)", ", ".join(provedores) if provedores else "—")
-            st.metric("Registros", len(df_focus))
+            provider_value = html.escape(", ".join(provedores)) if provedores else "—"
+            st.markdown(
+                f"""
+                <div class="sidebar-card sidebar-card--compact sidebar-card--provider">
+                    <div class="sidebar-card__label">Provedor(es)</div>
+                    <div class="sidebar-card__value">{provider_value}</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+            st.markdown(
+                f"""
+                <div class="sidebar-card sidebar-card--compact sidebar-card--records">
+                    <div class="sidebar-card__label">Registros</div>
+                    <div class="sidebar-card__value">{len(df_focus):,}</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
             st.markdown(_com_icone(ICONE_TABELA, "Colunas FOCUS disponíveis"), unsafe_allow_html=True)
             colunas_presentes = [c for c in COLUNAS_OFICIAIS_FOCUS if df_focus[c].notna().any()]
             colunas_ausentes = [c for c in COLUNAS_OFICIAIS_FOCUS if c not in colunas_presentes]
-            st.caption(", ".join(colunas_presentes))
+
+            itens_presentes = "".join(f"<li>{html.escape(col)}</li>" for col in colunas_presentes)
+            st.markdown(
+                f"""
+                <ul class="focus-columns-list">{itens_presentes}</ul>
+                """,
+                unsafe_allow_html=True,
+            )
+
             if colunas_ausentes:
                 with st.expander("Sem dado nesta fonte"):
-                    st.caption(", ".join(colunas_ausentes))
-
-        alert_html = f"""
-        <div id="focus-overlay" style="display:block;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(2,6,23,0.72);z-index:9999;backdrop-filter:blur(2px);">
-            <div id="focus-alert-box" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(15,23,42,0.97);padding:20px 26px;border-radius:14px;box-shadow:0 18px 36px rgba(14,116,144,0.25);min-width:320px;border:1px solid rgba(56,189,248,0.5);border-left:5px solid #38bdf8;">
-                <h3 style="margin:0 0 10px 0;color:#e2e8f0;font-size:1.1rem;">Conversão concluída</h3>
-                <p style="margin:0 0 16px 0;font-size:0.96rem;line-height:1.5;color:#e2e8f0;"><strong style="color:#38bdf8;">Formato detectado:</strong> {formato.upper()}</p>
-                <button type="button" onclick="document.getElementById('focus-overlay').style.display='none';" style="padding:8px 16px;background:#38bdf8;color:#08111d;border:none;border-radius:6px;cursor:pointer;font-weight:700;box-shadow:0 4px 10px rgba(56,189,248,0.2);">OK</button>
-            </div>
-        </div>
-        """
-        components.html(alert_html, height=760, scrolling=False)
+                    itens_ausentes = "".join(f"<li class='missing'>{html.escape(col)}</li>" for col in colunas_ausentes)
+                    st.markdown(
+                        f"""
+                        <ul class="focus-columns-list">{itens_ausentes}</ul>
+                        """,
+                        unsafe_allow_html=True,
+                    )
 
         #--- resumo geral (KPIs) logo no topo, antes de abrir as abas ---
         kpis = calcular_kpis(df_focus)
@@ -278,6 +302,29 @@ if arquivo_enviado is not None:
         with aba_graficos:
             st.markdown(_com_icone(ICONE_GRAFICO, "Visualizações geradas a partir das colunas disponíveis"), unsafe_allow_html=True)
             graficos = gerar_graficos(df_focus)
+
+            # Ajuste de apresentação feito após a criação do gráfico.
+            for fig in graficos:
+                titulo = getattr(fig.layout.title, "text", None)
+
+                if titulo == "Custos por ServiceName":
+                    for trace in fig.data:
+                        if hasattr(trace, "x") and hasattr(trace, "y"):
+                            # Inverte os eixos do trace
+                            x_original = list(trace.x)
+                            trace.x = list(trace.y)
+                            trace.y = x_original
+
+                        trace.orientation = "h"
+
+                    # Ajustes finais de leitura do gráfico.
+                    fig.update_layout(
+                        xaxis_title="Valor",
+                        yaxis_title="ServiceName",
+                        bargap=0.2,
+                        height=620,
+                        margin=dict(l=150, r=20, t=40, b=40),
+                    )
 
             if not graficos:
                 st.info("Não há dados suficientes neste arquivo para gerar visualizações.")
