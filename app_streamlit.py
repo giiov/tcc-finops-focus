@@ -227,21 +227,6 @@ if arquivo_enviado is not None:
                 with st.expander("Sem dado nesta fonte"):
                     st.caption(", ".join(colunas_ausentes))
 
-        st.markdown(
-            f"""
-            <div id="focus-alert-overlay" class="focus-alert-overlay">
-                <div class="focus-alert">
-                    <div class="focus-alert-texto">
-                        <strong>Formato detectado:</strong> {formato.upper()}<br>
-                        Conversão concluída
-                    </div>
-                    <button type="button" onclick="document.getElementById('focus-alert-overlay').style.display='none';">OK</button>
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
         #--- resumo geral (KPIs) logo no topo, antes de abrir as abas ---
         kpis = calcular_kpis(df_focus)
         col_efetivo, col_faturado, col_economia = st.columns([2.5, 1.25, 1.25])
