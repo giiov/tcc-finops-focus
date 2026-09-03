@@ -81,6 +81,21 @@ st.markdown(
         border-radius: 14px;
     }
 
+    [data-testid="stDownloadButton"] button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    [data-testid="stDownloadButton"] button::before {
+        content: "";
+        width: 16px;
+        height: 16px;
+        flex: 0 0 16px;
+        background-color: currentColor;
+        -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3v12'/%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3Cpath d='M5 21h14'/%3E%3C/svg%3E") center / 16px 16px no-repeat;
+        mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3v12'/%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3Cpath d='M5 21h14'/%3E%3C/svg%3E") center / 16px 16px no-repeat;
+    }
+
     [data-testid="stMetric"] {
         background: #111827;
         border: 1px solid rgba(30, 41, 59, 0.95);
@@ -107,40 +122,42 @@ st.markdown(
     }
 
     .sidebar-card {
-        background: rgba(15, 23, 42, 0.82);
-        border: 1px solid rgba(148, 163, 184, 0.22);
-        border-radius: 12px;
-        padding: 1rem 10rem;
+        background: #111827;
+        border: 1px solid rgba(30, 41, 59, 0.95);
+        border-radius: 14px;
+        padding: 12px 14px;
         margin: 0 0 10px;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+        box-shadow: 0 0 0 rgba(56, 189, 248, 0);
+        transition: box-shadow 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+    }
+    .sidebar-card:hover {
+        box-shadow: 0 0.75rem 1.5rem rgba(56, 189, 248, 0.14);
+        border-color: rgba(56, 189, 248, 0.8);
+        transform: translateY(-2px);
     }
     .sidebar-card--compact {
-        padding: 10px 12px;
+        padding: 12px 14px;
     }
     .sidebar-card__label {
-        font-size: 0.7rem;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: #cbd5e1;
-        margin-bottom: 0.05rem;
+        font-size: 0.875rem;
+        font-weight: 400;
+        letter-spacing: normal;
+        color: rgba(250, 250, 250, 0.6);
+        margin-bottom: 0.25rem;
     }
     .sidebar-card__value {
-        font-size: clamp(1.2rem, 2vw, 2.2rem);
-        line-height: 1.1;
-        font-weight: 800;
+        font-size: 1.75rem;
+        line-height: 1.2;
+        font-weight: 700;
         color: #38bdf8;
         word-break: break-word;
     }
-    .sidebar-card--provider .sidebar-card__value {
-        color: #7dd3fc;
-    }
-    .sidebar-card--records .sidebar-card__value {
-        color: #67e8f9;
+    .sidebar-section-title {
+        margin-bottom: 12px;
     }
     .focus-columns-list {
         list-style: disc;
-        margin: 0 0 1rem 0;
+        margin: 12px 0;
         padding-left: 1.1rem;
         column-count: 2;
         column-gap: 1.2rem;
@@ -230,7 +247,10 @@ if arquivo_enviado is not None:
 
         #--- preenche a secao de dataset na sidebar, criada mais acima ---
         with secao_dataset:
-            st.markdown(_com_icone(ICONE_CAMADAS, "DATASET ATUAL"), unsafe_allow_html=True)
+            st.markdown(
+                f'<div class="sidebar-section-title">{_com_icone(ICONE_CAMADAS, "DATASET ATUAL")}</div>',
+                unsafe_allow_html=True,
+            )
 
             provedores = df_focus["ProviderName"].dropna().unique().tolist()
             provider_value = html.escape(", ".join(provedores)) if provedores else "—"
@@ -276,7 +296,7 @@ if arquivo_enviado is not None:
                         unsafe_allow_html=True,
                     )
 
-        #--- resumo geral (KPIs) logo no topo, antes de abrir as abas ---
+        # Os calculos dos KPIs sao mantidos para uso futuro; os cards exibem apenas os valores.
         kpis = calcular_kpis(df_focus)
         col_efetivo, col_faturado, col_economia = st.columns([2.5, 1.25, 1.25])
 
@@ -285,7 +305,7 @@ if arquivo_enviado is not None:
         if kpis["total_faturado"] is not None:
             col_faturado.metric("Total faturado", f"${kpis['total_faturado']:,.2f}")
         if kpis["economia"] is not None:
-            col_economia.metric("Economia", f"${kpis['economia']:,.2f}", f"{kpis['economia_pct']:.1f}%")
+            col_economia.metric("Economia", f"${kpis['economia']:,.2f}")
 
         aba_dados, aba_graficos = st.tabs(["Dados", "Visualizações"])
 
@@ -302,29 +322,6 @@ if arquivo_enviado is not None:
         with aba_graficos:
             st.markdown(_com_icone(ICONE_GRAFICO, "Visualizações geradas a partir das colunas disponíveis"), unsafe_allow_html=True)
             graficos = gerar_graficos(df_focus)
-
-            # Ajuste de apresentação feito após a criação do gráfico.
-            for fig in graficos:
-                titulo = getattr(fig.layout.title, "text", None)
-
-                if titulo == "Custos por ServiceName":
-                    for trace in fig.data:
-                        if hasattr(trace, "x") and hasattr(trace, "y"):
-                            # Inverte os eixos do trace
-                            x_original = list(trace.x)
-                            trace.x = list(trace.y)
-                            trace.y = x_original
-
-                        trace.orientation = "h"
-
-                    # Ajustes finais de leitura do gráfico.
-                    fig.update_layout(
-                        xaxis_title="Valor",
-                        yaxis_title="ServiceName",
-                        bargap=0.2,
-                        height=620,
-                        margin=dict(l=150, r=20, t=40, b=40),
-                    )
 
             if not graficos:
                 st.info("Não há dados suficientes neste arquivo para gerar visualizações.")
