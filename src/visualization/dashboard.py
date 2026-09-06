@@ -14,11 +14,24 @@ MAX_CATEGORIAS = 10
 #paleta fixa por coluna de custo -- garante que a mesma cor sempre representa a mesma
 #metrica em todos os graficos, em vez da cor mudar dependendo de quais colunas existem
 CORES_POR_CUSTO = {
-    "BilledCost": "#3b82f6",
-    "EffectiveCost": "#22d3ee",
-    "ContractedCost": "#f59e0b",
-    "ListCost": "#94a3b8",
+    "BilledCost": "#F2B134",
+    "EffectiveCost": "#2FBF71",
+    "ContractedCost": "#E85D75",
+    "ListCost": "#7C6FF2",
 }
+
+CORES_POR_CATEGORIA = [
+    "#E85D75",
+    "#2FBF71",
+    "#F2B134",
+    "#22A6B3",
+    "#A85BC7",
+    "#F07C3E",
+    "#D94F8A",
+    "#6FAE4F",
+    "#4D7CFE",
+    "#C58A3A",
+]
 
 
 def _aplicar_tema(fig):
@@ -28,12 +41,12 @@ def _aplicar_tema(fig):
         template="plotly_dark",
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(color="#cbd5e1"),
+        font=dict(family="Inter", color="#d0c9cd"),
         legend=dict(orientation="h", y=-0.2),
         margin=dict(t=48, b=16, l=8, r=8),
     )
-    fig.update_xaxes(gridcolor="#1e293b")
-    fig.update_yaxes(gridcolor="#1e293b")
+    fig.update_xaxes(gridcolor="#514b50")
+    fig.update_yaxes(gridcolor="#514b50")
     return fig
 
 
@@ -97,6 +110,7 @@ def grafico_por_dimensao(df_focus, coluna_dimensao):
             names=coluna_dimensao,
             values=colunas_valor[0],
             hole=0.45,
+            color_discrete_sequence=CORES_POR_CATEGORIA,
             title=f"Custos por {coluna_dimensao}",
         )
         fig.update_traces(textposition="inside", textinfo="percent+label")

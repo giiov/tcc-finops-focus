@@ -1,3 +1,4 @@
+import base64
 import html
 import os
 import streamlit as st
@@ -13,7 +14,10 @@ from src.schemas.focus_schema import COLUNAS_OFICIAIS_FOCUS
 st.set_page_config(page_title="FOCUS Multi-Cloud", layout="wide", initial_sidebar_state="expanded")
 
 #icones em SVG (sem emoji) -- usam stroke="currentColor" pra herdar a cor do texto ao redor
-ICONE_NUVEM = '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>'
+with open(os.path.join("src", "logo.png"), "rb") as arquivo_logo:
+    LOGO_BASE64 = base64.b64encode(arquivo_logo.read()).decode("ascii")
+
+ICONE_NUVEM = f'<img src="data:image/png;base64,{LOGO_BASE64}" alt="Logo FOCUS">'
 ICONE_GRAFICO = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>'
 ICONE_TABELA = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>'
 ICONE_CAMADAS = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>'
@@ -24,7 +28,7 @@ def _com_icone(svg, texto):
     return f'<div style="display:flex;align-items:center;gap:8px;">{svg}<span>{texto}</span></div>'
 
 
-#--- identidade visual: paleta azul-marinho/ciano (cloud + dados) ---
+#--- identidade visual: paleta ameixa/rosa (cloud + dados) ---
 #a base do modo escuro (cores de fundo, texto, componentes nativos) vem do
 #.streamlit/config.toml -- aqui so ajustamos os elementos que criamos por conta propria
 st.markdown(
@@ -34,22 +38,27 @@ st.markdown(
 
     html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
+    body,
+    [data-testid="stAppViewContainer"] {
+        background: linear-gradient(0deg, #190019 0%, #2b124c 100%);
+    }
+
     .focus-titulo {
         font-size: 3rem !important;
         font-weight: 800;
         letter-spacing: -0.03em;
-        color: #e2e8f0;
+        color: #f3e8ef;
         margin: 0;
         line-height: 1.1;
     }
     .focus-titulo .destaque {
-        background: linear-gradient(90deg, #38bdf8, #22d3ee);
+        background: linear-gradient(90deg, #9833af, #b24a82);
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
     }
     .focus-subtitulo {
-        color: #94a3b8;
+        color: #f3e8ef;
         font-size: 0.95rem;
         margin: 2px 0 0 0;
     }
@@ -57,15 +66,21 @@ st.markdown(
         display: flex;
         align-items: flex-start;
         justify-content: center;
-        width: 3rem;
-        height: 3rem;
-        color: #38bdf8;
+        width: 4.5rem;
+        height: 4.5rem;
+        color: #d47fa3;
         flex-shrink: 0;
-        margin-top: 0.38rem;
+        margin-top: -0.5rem;
     }
     .focus-icone svg {
         width: 100%;
         height: 100%;
+        display: block;
+    }
+    .focus-icone img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
         display: block;
     }
     .focus-texto {
@@ -77,7 +92,7 @@ st.markdown(
     }
 
     [data-testid="stFileUploaderDropzone"] {
-        border: 1.5px dashed #1d4ed8;
+        border: 1.5px dashed #b24a82;
         border-radius: 14px;
     }
 
@@ -97,59 +112,95 @@ st.markdown(
     }
 
     [data-testid="stMetric"] {
-        background: #111827;
-        border: 1px solid rgba(30, 41, 59, 0.95);
+        background: #2d2b2e;
+        border: 1px solid rgba(181, 169, 176, 0.42);
         border-radius: 14px;
         padding: 12px 14px;
-        box-shadow: 0 0 0 rgba(56, 189, 248, 0);
+        box-shadow: 0 0 0 rgba(212, 127, 163, 0);
         transition: box-shadow 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
     }
     [data-testid="stMetric"]:hover {
-        box-shadow: 0 0.75rem 1.5rem rgba(56, 189, 248, 0.14);
-        border-color: rgba(56, 189, 248, 0.8);
+        box-shadow: 0 0.75rem 1.5rem rgba(212, 127, 163, 0.14);
+        border-color: rgba(212, 127, 163, 0.8);
         transform: translateY(-2px);
     }
-    [data-testid="stMetricValue"] { color: #38bdf8; font-weight: 700; }
+    [data-testid="stMetricValue"] { color: #d47fa3; font-weight: 700; }
+
+    [data-testid="stHorizontalBlock"] > div:nth-child(1) [data-testid="stMetric"] {
+        background: #2c3032;
+        border-color: rgba(157, 174, 177, 0.58);
+    }
+    [data-testid="stHorizontalBlock"] > div:nth-child(1) [data-testid="stMetricValue"] {
+        color: #8fb6c6;
+    }
+    [data-testid="stHorizontalBlock"] > div:nth-child(2) [data-testid="stMetric"] {
+        background: #33312d;
+        border-color: rgba(187, 171, 137, 0.58);
+    }
+    [data-testid="stHorizontalBlock"] > div:nth-child(2) [data-testid="stMetricValue"] {
+        color: #d2b276;
+    }
+    [data-testid="stHorizontalBlock"] > div:nth-child(3) [data-testid="stMetric"] {
+        background: #2d322f;
+        border-color: rgba(146, 173, 157, 0.58);
+    }
+    [data-testid="stHorizontalBlock"] > div:nth-child(3) [data-testid="stMetricValue"] {
+        color: #91bd9f;
+    }
 
     .stTabs [data-baseweb="tab"] { font-weight: 600; }
-    .stTabs [aria-selected="true"] { color: #38bdf8 !important; }
+    .stTabs [aria-selected="true"] { color: #d47fa3 !important; }
 
     .sidebar-explicacao {
         font-size: 0.85rem;
-        color: #94a3b8;
+        color: #d0c9cd;
         line-height: 1.5;
         margin: 0;
     }
 
     .sidebar-card {
-        background: #111827;
-        border: 1px solid rgba(30, 41, 59, 0.95);
+        background: #2d2b2e;
+        border: 1px solid rgba(181, 169, 176, 0.42);
         border-radius: 14px;
         padding: 12px 14px;
         margin: 0 0 10px;
-        box-shadow: 0 0 0 rgba(56, 189, 248, 0);
+        box-shadow: 0 0 0 rgba(212, 127, 163, 0);
         transition: box-shadow 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
     }
     .sidebar-card:hover {
-        box-shadow: 0 0.75rem 1.5rem rgba(56, 189, 248, 0.14);
-        border-color: rgba(56, 189, 248, 0.8);
+        box-shadow: 0 0.75rem 1.5rem rgba(212, 127, 163, 0.14);
+        border-color: rgba(212, 127, 163, 0.8);
         transform: translateY(-2px);
     }
     .sidebar-card--compact {
         padding: 12px 14px;
     }
+    .sidebar-card--provider {
+        background: #302f32;
+        border-color: rgba(177, 171, 183, 0.56);
+    }
+    .sidebar-card--provider .sidebar-card__value {
+        color: #b6a7d0;
+    }
+    .sidebar-card--records {
+        background: #33312d;
+        border-color: rgba(187, 171, 137, 0.58);
+    }
+    .sidebar-card--records .sidebar-card__value {
+        color: #d2b276;
+    }
     .sidebar-card__label {
         font-size: 0.875rem;
         font-weight: 400;
         letter-spacing: normal;
-        color: rgba(250, 250, 250, 0.6);
+        color: rgba(231, 225, 228, 0.7);
         margin-bottom: 0.25rem;
     }
     .sidebar-card__value {
         font-size: 1.75rem;
         line-height: 1.2;
         font-weight: 700;
-        color: #38bdf8;
+        color: #d47fa3;
         word-break: break-word;
     }
     .sidebar-section-title {
@@ -174,7 +225,7 @@ st.markdown(
         background: transparent;
         border: none;
         border-radius: 0;
-        color: #e2e8f0;
+        color: #f3e8ef;
         font-size: 0.74rem;
         line-height: 1.3;
         white-space: normal;
@@ -183,7 +234,7 @@ st.markdown(
     .focus-columns-list li.missing {
         background: transparent;
         border: none;
-        color: #94a3b8;
+        color: #d0c9cd;
     }
     </style>
     """,
