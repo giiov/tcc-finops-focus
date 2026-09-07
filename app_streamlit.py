@@ -43,6 +43,11 @@ st.markdown(
         background: linear-gradient(0deg, #190019 0%, #2b124c 100%);
     }
 
+    [data-testid="stAppDeployButton"],
+    [data-testid="stMainMenu"] {
+        visibility: hidden;
+    }
+
     .focus-titulo {
         font-size: 3rem !important;
         font-weight: 800;
@@ -152,7 +157,8 @@ st.markdown(
     .stTabs [aria-selected="true"] { color: #d47fa3 !important; }
 
     .sidebar-explicacao {
-        font-size: 0.85rem;
+        font-size: 0.8rem !important    ;
+        font-family: 'Inter', sans-serif;
         color: #d0c9cd;
         line-height: 1.5;
         margin: 0;
@@ -190,7 +196,7 @@ st.markdown(
         color: #d2b276;
     }
     .sidebar-card__label {
-        font-size: 0.875rem;
+        font-size: 0.7rem;
         font-weight: 400;
         letter-spacing: normal;
         color: rgba(231, 225, 228, 0.7);
