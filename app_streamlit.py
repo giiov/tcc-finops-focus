@@ -14,7 +14,6 @@ from src.schemas.focus_schema import COLUNAS_OFICIAIS_FOCUS
 st.set_page_config(page_title="FOCUS Multi-Cloud", layout="wide", initial_sidebar_state="expanded")
 
 #icones em SVG (sem emoji) -- usam stroke="currentColor" pra herdar a cor do texto ao redor
-ICONE_NUVEM = '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>'
 with open(os.path.join("src", "logo.png"), "rb") as arquivo_logo:
     LOGO_BASE64 = base64.b64encode(arquivo_logo.read()).decode("ascii")
 
@@ -29,7 +28,6 @@ def _com_icone(svg, texto):
     return f'<div style="display:flex;align-items:center;gap:8px;">{svg}<span>{texto}</span></div>'
 
 
-#--- identidade visual: paleta azul-marinho/ciano (cloud + dados) ---
 #--- identidade visual: paleta ameixa/rosa (cloud + dados) ---
 #a base do modo escuro (cores de fundo, texto, componentes nativos) vem do
 #.streamlit/config.toml -- aqui so ajustamos os elementos que criamos por conta propria
@@ -59,14 +57,12 @@ st.markdown(
         line-height: 1.1;
     }
     .focus-titulo .destaque {
-        background: linear-gradient(90deg, #38bdf8, #22d3ee);
         background: linear-gradient(90deg, #9833af, #b24a82);
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
     }
     .focus-subtitulo {
-        color: #94a3b8;
         color: #f3e8ef;
         font-size: 0.95rem;
         margin: 2px 0 0 0;
@@ -75,13 +71,10 @@ st.markdown(
         display: flex;
         align-items: flex-start;
         justify-content: center;
-        width: 3rem;
-        color: #38bdf8;
         width: 4.5rem;
         height: 4.5rem;
         color: #d47fa3;
         flex-shrink: 0;
-        margin-top: 0.38rem;
         margin-top: -0.5rem;
     }
     .focus-icone svg {
@@ -104,7 +97,6 @@ st.markdown(
     }
 
     [data-testid="stFileUploaderDropzone"] {
-        border: 1.5px dashed #1d4ed8;
         border: 1.5px dashed #b24a82;
         border-radius: 14px;
     }
@@ -125,96 +117,46 @@ st.markdown(
     }
 
     [data-testid="stMetric"] {
-        background: #111827;
-        border: 1px solid rgba(30, 41, 59, 0.95);
         background: #2d2b2e;
         border: 1px solid rgba(181, 169, 176, 0.42);
         border-radius: 14px;
         padding: 12px 14px;
-        box-shadow: 0 0 0 rgba(56, 189, 248, 0);
         box-shadow: 0 0 0 rgba(212, 127, 163, 0);
         transition: box-shadow 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
     }
     [data-testid="stMetric"]:hover {
-        border-color: rgba(56, 189, 248, 0.8);
         box-shadow: 0 0.75rem 1.5rem rgba(212, 127, 163, 0.14);
         border-color: rgba(212, 127, 163, 0.8);
         transform: translateY(-2px);
     }
-    [data-testid="stMetricValue"] { color: #38bdf8; font-weight: 700; }
     [data-testid="stMetricValue"] { color: #d47fa3; font-weight: 700; }
 
-    .focus-alert-overlay {
-        position: fixed;
-        inset: 0;
-        z-index: 9999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(2, 6, 23, 0.72);
-        backdrop-filter: blur(2px);
     [data-testid="stHorizontalBlock"] > div:nth-child(1) [data-testid="stMetric"] {
         background: #2c3032;
         border-color: rgba(157, 174, 177, 0.58);
     }
-    .focus-alert {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 18px;
-        width: min(520px, calc(100vw - 32px));
-        padding: 18px 20px;
-        border: 1px solid rgba(56, 189, 248, 0.55);
-        border-left: 5px solid #38bdf8;
-        border-radius: 14px;
-        background: rgba(15, 23, 42, 0.96);
-        box-shadow: 0 20px 45px rgba(14, 116, 144, 0.26);
-        color: #e2e8f0;
     [data-testid="stHorizontalBlock"] > div:nth-child(1) [data-testid="stMetricValue"] {
         color: #8fb6c6;
     }
-    .focus-alert-texto {
-        font-size: 0.98rem;
-        line-height: 1.5;
-        color: #e2e8f0;
     [data-testid="stHorizontalBlock"] > div:nth-child(2) [data-testid="stMetric"] {
         background: #33312d;
         border-color: rgba(187, 171, 137, 0.58);
     }
-    .focus-alert-texto strong {
-        color: #38bdf8;
     [data-testid="stHorizontalBlock"] > div:nth-child(2) [data-testid="stMetricValue"] {
         color: #d2b276;
     }
-    .focus-alert button {
-        background: #38bdf8;
-        color: #08111d;
-        border: none;
-        border-radius: 8px;
-        padding: 9px 16px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
-        box-shadow: 0 4px 10px rgba(56, 189, 248, 0.2);
-        flex-shrink: 0;
     [data-testid="stHorizontalBlock"] > div:nth-child(3) [data-testid="stMetric"] {
         background: #2d322f;
         border-color: rgba(146, 173, 157, 0.58);
     }
-    .focus-alert button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 8px 18px rgba(56, 189, 248, 0.28);
     [data-testid="stHorizontalBlock"] > div:nth-child(3) [data-testid="stMetricValue"] {
         color: #91bd9f;
     }
 
     .stTabs [data-baseweb="tab"] { font-weight: 600; }
-    .stTabs [aria-selected="true"] { color: #38bdf8 !important; }
     .stTabs [aria-selected="true"] { color: #d47fa3 !important; }
 
     .sidebar-explicacao {
-        font-size: 0.85rem;
-        color: #94a3b8;
         font-size: 0.8rem !important    ;
         font-family: 'Inter', sans-serif;
         color: #d0c9cd;
@@ -392,7 +334,6 @@ if arquivo_enviado is not None:
             st.markdown(_com_icone(ICONE_TABELA, "Colunas FOCUS disponíveis"), unsafe_allow_html=True)
             colunas_presentes = [c for c in COLUNAS_OFICIAIS_FOCUS if df_focus[c].notna().any()]
             colunas_ausentes = [c for c in COLUNAS_OFICIAIS_FOCUS if c not in colunas_presentes]
-            st.caption(", ".join(colunas_presentes))
 
             itens_presentes = "".join(f"<li>{html.escape(col)}</li>" for col in colunas_presentes)
             st.markdown(
@@ -404,8 +345,6 @@ if arquivo_enviado is not None:
 
             if colunas_ausentes:
                 with st.expander("Sem dado nesta fonte"):
-                    st.caption(", ".join(colunas_ausentes))
-
                     itens_ausentes = "".join(f"<li class='missing'>{html.escape(col)}</li>" for col in colunas_ausentes)
                     st.markdown(
                         f"""
@@ -427,7 +366,6 @@ if arquivo_enviado is not None:
         if kpis["total_faturado"] is not None:
             col_faturado.metric("Total faturado", f"${kpis['total_faturado']:,.2f}")
         if kpis["economia"] is not None:
-            col_economia.metric("Economia", f"${kpis['economia']:,.2f}", f"{kpis['economia_pct']:.1f}%")
             col_economia.metric("Economia", f"${kpis['economia']:,.2f}")
 
         aba_dados, aba_graficos = st.tabs(["Dados", "Visualizações"])
