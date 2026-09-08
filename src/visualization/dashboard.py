@@ -14,10 +14,6 @@ MAX_CATEGORIAS = 10
 #paleta fixa por coluna de custo -- garante que a mesma cor sempre representa a mesma
 #metrica em todos os graficos, em vez da cor mudar dependendo de quais colunas existem
 CORES_POR_CUSTO = {
-    "BilledCost": "#3b82f6",
-    "EffectiveCost": "#22d3ee",
-    "ContractedCost": "#f59e0b",
-    "ListCost": "#94a3b8",
     "BilledCost": "#F2B134",
     "EffectiveCost": "#2FBF71",
     "ContractedCost": "#E85D75",
@@ -45,13 +41,10 @@ def _aplicar_tema(fig):
         template="plotly_dark",
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(color="#cbd5e1"),
         font=dict(family="Inter", color="#d0c9cd"),
         legend=dict(orientation="h", y=-0.2),
         margin=dict(t=48, b=16, l=8, r=8),
     )
-    fig.update_xaxes(gridcolor="#1e293b")
-    fig.update_yaxes(gridcolor="#1e293b")
     fig.update_xaxes(gridcolor="#514b50")
     fig.update_yaxes(gridcolor="#514b50")
     return fig
@@ -62,7 +55,6 @@ def _custos_disponiveis(df_focus):
 
 
 def calcular_kpis(df_focus):
-    #resumo geral do dataset -- usado nos cartoes de metrica no topo da pagina
     # Mantem os calculos para possivel uso futuro no app, sem exibi-los atualmente.
     colunas_valor = _custos_disponiveis(df_focus)
     total_faturado = df_focus["BilledCost"].sum() if "BilledCost" in colunas_valor else None
