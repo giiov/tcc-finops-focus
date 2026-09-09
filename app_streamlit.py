@@ -14,8 +14,11 @@ from src.schemas.focus_schema import COLUNAS_OFICIAIS_FOCUS
 st.set_page_config(page_title="FOCUS Multi-Cloud", layout="wide", initial_sidebar_state="expanded")
 
 #icones em SVG (sem emoji) -- usam stroke="currentColor" pra herdar a cor do texto ao redor
-with open(os.path.join("src", "logo.png"), "rb") as arquivo_logo:
+with open(os.path.join("src", "logo_nuvem.png"), "rb") as arquivo_logo:
     LOGO_BASE64 = base64.b64encode(arquivo_logo.read()).decode("ascii")
+
+with open(os.path.join("src", "Trap-Black 900.otf"), "rb") as arquivo_fonte:
+    FONTE_TITULO_BASE64 = base64.b64encode(arquivo_fonte.read()).decode("ascii")
 
 ICONE_NUVEM = f'<img src="data:image/png;base64,{LOGO_BASE64}" alt="Logo FOCUS">'
 ICONE_GRAFICO = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>'
@@ -36,6 +39,13 @@ st.markdown(
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
 
+    @font-face {
+        font-family: 'Trap Black';
+        src: url(data:font/otf;base64,{FONTE_TITULO_BASE64}) format('opentype');
+        font-weight: 900;
+        font-style: normal;
+    }
+
     html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
     body,
@@ -49,8 +59,9 @@ st.markdown(
     }
 
     .focus-titulo {
+        font-family: 'Trap Black', sans-serif;
         font-size: 3rem !important;
-        font-weight: 800;
+        font-weight: 900;
         letter-spacing: -0.03em;
         color: #f3e8ef;
         margin: 0;
@@ -75,7 +86,7 @@ st.markdown(
         height: 4.5rem;
         color: #d47fa3;
         flex-shrink: 0;
-        margin-top: -0.5rem;
+        margin-top: -0.9rem;
     }
     .focus-icone svg {
         width: 100%;
@@ -242,8 +253,66 @@ st.markdown(
         border: none;
         color: #d0c9cd;
     }
+
+    [data-testid="stAppViewContainer"] .main .block-container {
+        width: 100%;
+        max-width: 1440px;
+        padding-top: 2rem;
+        padding-bottom: 3rem;
+    }
+
+    @media (min-width: 992px) and (max-width: 1199px) {
+        [data-testid="stSidebar"] {
+            width: 280px;
+        }
+        [data-testid="stAppViewContainer"] .main .block-container {
+            max-width: 1120px;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+        .focus-titulo {
+            font-size: 2.65rem !important;
+        }
+        .focus-subtitulo {
+            font-size: 0.9rem;
+        }
+        .focus-icone {
+            width: 4rem;
+            height: 4rem;
+        }
+        [data-testid="stMetric"] {
+            padding: 10px 12px;
+        }
+        .sidebar-card__value {
+            font-size: 1.55rem;
+        }
+    }
+
+    @media (min-width: 1200px) {
+        [data-testid="stSidebar"] {
+            width: 320px;
+        }
+        [data-testid="stAppViewContainer"] .main .block-container {
+            max-width: 1440px;
+            padding-left: 3rem;
+            padding-right: 3rem;
+        }
+        .focus-titulo {
+            font-size: 3.25rem !important;
+        }
+        .focus-subtitulo {
+            font-size: 1rem;
+        }
+        .focus-icone {
+            width: 4.75rem;
+            height: 4.75rem;
+        }
+        [data-testid="stMetric"] {
+            padding: 14px 16px;
+        }
+    }
     </style>
-    """,
+    """.replace("{FONTE_TITULO_BASE64}", FONTE_TITULO_BASE64),
     unsafe_allow_html=True,
 )
 

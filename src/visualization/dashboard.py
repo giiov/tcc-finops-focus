@@ -105,8 +105,12 @@ def grafico_por_dimensao(df_focus, coluna_dimensao):
     agrupado = _agrupar_com_outros(df_focus, coluna_dimensao, colunas_valor)
 
     if coluna_dimensao == "ChargeCategory":
+        # Pie charts representam partes de um todo e nao aceitam valores negativos.
+        # Refunds e credits continuam nos dados, mas sao exibidos pela magnitude.
+        valores_pie = agrupado.copy()
+        valores_pie[colunas_valor[0]] = valores_pie[colunas_valor[0]].abs()
         fig = px.pie(
-            agrupado,
+            valores_pie,
             names=coluna_dimensao,
             values=colunas_valor[0],
             hole=0.45,

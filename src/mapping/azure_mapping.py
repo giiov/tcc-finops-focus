@@ -20,5 +20,9 @@ AZURE_MAPPING = {
     "PublisherName": "PublisherName",
 
     # Custos
+    # Alguns exports simplificados do Azure usam estes nomes equivalentes.
+    "PreTaxCost": "CostInBillingCurrency",
+    "ResourceRate": "UnitPrice",
+    "UsageQuantity": "Quantity",
     "PaygCostInBillingCurrency": "ListCost",
 }
