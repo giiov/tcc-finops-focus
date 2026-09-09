@@ -422,7 +422,11 @@ if arquivo_enviado is not None:
                         unsafe_allow_html=True,
                     )
 
+<<<<<<< HEAD
+        #--- resumo geral (KPIs) logo no topo, antes de abrir as abas ---
+=======
         # Os calculos dos KPIs sao mantidos para uso futuro; os cards exibem apenas os valores.
+>>>>>>> 809935d453c231a070ca68ab7e26d3d7dd9c9d00
         kpis = calcular_kpis(df_focus)
         col_efetivo, col_faturado, col_economia = st.columns([2.5, 1.25, 1.25])
 
