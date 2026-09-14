@@ -8,6 +8,7 @@ from src.mapping.detector import detectar_formato
 from src.converters.aws_converter import converter_aws
 from src.converters.gcp_converter import converter_gcp
 from src.converters.azure_converter import converter_azure
+from src.converters.oracle_converter import converter_oracle
 from src.visualization.dashboard import gerar_graficos, calcular_kpis
 from src.schemas.focus_schema import COLUNAS_OFICIAIS_FOCUS
 
@@ -254,7 +255,7 @@ st.markdown(
         <div class="focus-icone">{ICONE_NUVEM}</div>
         <div class="focus-texto">
             <p class="focus-titulo"><span class="destaque">FOCUS</span> Multi-Cloud</p>
-            <p class="focus-subtitulo">Padronização e análise de custos AWS, GCP e Azure em um único padrão</p>
+            <p class="focus-subtitulo">Padronização e análise de custos AWS, GCP, Azure e Oracle em um único padrão</p>
         </div>
     </div>
     """,
@@ -268,7 +269,7 @@ with st.sidebar:
         """
         <p class="sidebar-explicacao">
         Ferramenta de TCC que recebe arquivos de custo de diferentes provedores de nuvem
-        (AWS, GCP, Azure), identifica automaticamente a origem e converte os dados para o
+        (AWS, GCP, Azure, Oracle), identifica automaticamente a origem e converte os dados para o
         padrão <b>FOCUS</b> (FinOps Open Cost and Usage Specification) — permitindo comparar
         e analisar custos multi-cloud em uma estrutura única.
         </p>
@@ -301,6 +302,8 @@ if arquivo_enviado is not None:
             df_focus = converter_aws(caminho_arquivo)
         elif formato == "azure":
             df_focus = converter_azure(caminho_arquivo)
+        elif formato == "oracle":
+            df_focus = converter_oracle(caminho_arquivo)
 
         #--- preenche a secao de dataset na sidebar, criada mais acima ---
         with secao_dataset:
@@ -353,11 +356,8 @@ if arquivo_enviado is not None:
                         unsafe_allow_html=True,
                     )
 
-<<<<<<< HEAD
         #--- resumo geral (KPIs) logo no topo, antes de abrir as abas ---
-=======
-        # Os calculos dos KPIs sao mantidos para uso futuro; os cards exibem apenas os valores.
->>>>>>> 809935d453c231a070ca68ab7e26d3d7dd9c9d00
+        #os calculos dos KPIs sao mantidos para uso futuro; os cards exibem apenas os valores
         kpis = calcular_kpis(df_focus)
         col_efetivo, col_faturado, col_economia = st.columns([2.5, 1.25, 1.25])
 
