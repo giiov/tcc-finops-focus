@@ -3,8 +3,9 @@ import pandas as pd
 from src.mapping.gcp_mapping import GCP_MAPPING
 from src.mapping.aws_mapping import AWS_MAPPING
 from src.mapping.azure_mapping import AZURE_MAPPING
+from src.mapping.oracle_mapping import ORACLE_MAPPING
 
-#identifica se um arquivo csv é do formato gcp ou aws
+#identifica se um arquivo csv é do formato gcp, aws, azure ou oracle
 #comparando as colunas com as chaves de cada mapping
 def detectar_formato(caminho_arquivo):
 
@@ -15,14 +16,21 @@ def detectar_formato(caminho_arquivo):
     colunas_gcp = set(GCP_MAPPING.keys())
     colunas_aws = set(AWS_MAPPING.keys())
     colunas_azure = set(AZURE_MAPPING.keys())
+    colunas_oracle = set(ORACLE_MAPPING.keys())
 
     #calcula quantas colunas do arquivo batem com cada formato
     intersecao_gcp = colunas_arquivo & colunas_gcp
     intersecao_aws = colunas_arquivo & colunas_aws
     intersecao_azure = colunas_arquivo & colunas_azure
+    intersecao_oracle = colunas_arquivo & colunas_oracle
 
     #decide pelo formato que teve mais colunas em comum
-    maior_intersecao = max(len(intersecao_gcp), len(intersecao_aws), len(intersecao_azure))
+    maior_intersecao = max(
+        len(intersecao_gcp),
+        len(intersecao_aws),
+        len(intersecao_azure),
+        len(intersecao_oracle),
+    )
 
     if maior_intersecao == 0:
         raise ValueError(f"Não foi possível identificar o formato do arquivo: {caminho_arquivo}")
@@ -33,7 +41,8 @@ def detectar_formato(caminho_arquivo):
         return "aws"
     elif maior_intersecao == len(intersecao_azure):
         return "azure"
-
+    elif maior_intersecao == len(intersecao_oracle):
+        return "oracle"
     else:
-        #nenhum dos dois bateu (ou bateram igual)
-        raise ValueError (f"Não foi possível identificar o formato do arquivo: {caminho_arquivo}")
+        #nenhum bateu (ou bateram igual)
+        raise ValueError(f"Não foi possível identificar o formato do arquivo: {caminho_arquivo}")
