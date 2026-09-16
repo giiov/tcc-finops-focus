@@ -1,0 +1,5 @@
+identity/LineItemId,lineItem/LineItemDescription,lineItem/UsageStartDate,lineItem/UsageEndDate,bill/PayerAccountId,lineItem/UsageAccountId,lineItem/LineItemType,lineItem/UnblendedCost,pricing/publicOnDemandCost,lineItem/CurrencyCode,bill/BillingEntity,lineItem/ResourceId,product/instanceType,product/ProductName,resourceTags/user:Environment
+1,EC2 instance running,2026-06-01T00:00:00Z,2026-06-01T23:59:59Z,123456789012,210987654321,Usage,120.00,120.00,USD,AWS,i-0staging001,t3.small,Amazon Elastic Compute Cloud,Staging
+2,S3 storage usage,2026-06-01T00:00:00Z,2026-06-01T23:59:59Z,123456789012,210987654321,Usage,15.75,15.75,USD,AWS,bucket-staging-logs,,Amazon Simple Storage Service,Staging
+3,Sales tax on EC2 usage,2026-06-01T00:00:00Z,2026-06-01T23:59:59Z,123456789012,210987654321,Tax,10.80,10.80,USD,AWS,i-0staging001,t3.small,Amazon Elastic Compute Cloud,Staging
+4,Promotional credit applied,2026-06-02T00:00:00Z,2026-06-02T23:59:59Z,123456789012,210987654321,Credit,-15.00,0.00,USD,AWS,i-0staging001,t3.small,Amazon Elastic Compute Cloud,Staging

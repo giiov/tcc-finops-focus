@@ -1,0 +1,11 @@
+identity/LineItemId,lineItem/LineItemDescription,lineItem/UsageStartDate,lineItem/UsageEndDate,bill/PayerAccountId,lineItem/UsageAccountId,lineItem/LineItemType,lineItem/UnblendedCost,pricing/publicOnDemandCost,bill/BillingEntity,lineItem/ResourceId,product/instanceType,product/ProductName,resourceTags/user:Environment
+101,EC2 instance running,2026-06-01T00:00:00Z,2026-06-01T23:59:59Z,987654321098,112233445566,Usage,540.75,600.00,AWS,i-0f9a8b7c6d5e4,m5.large,Amazon Elastic Compute Cloud,Production
+102,EBS volume storage,2026-06-01T00:00:00Z,2026-06-01T23:59:59Z,987654321098,112233445566,Usage,42.30,45.00,AWS,vol-0abc111222333,,Amazon Elastic Block Store,Production
+103,Sales tax on EC2 usage,2026-06-01T00:00:00Z,2026-06-01T23:59:59Z,987654321098,112233445566,Tax,54.08,54.08,AWS,i-0f9a8b7c6d5e4,m5.large,Amazon Elastic Compute Cloud,Production
+104,Reserved Instance upfront fee,2026-06-01T00:00:00Z,2026-06-01T23:59:59Z,987654321098,112233445566,RIFee,320.00,320.00,AWS,db-staging-rds-02,db.r5.large,Amazon Relational Database Service,Staging
+105,Promotional credit applied,2026-06-02T00:00:00Z,2026-06-02T23:59:59Z,987654321098,112233445566,Credit,-40.00,0.00,AWS,lambda-order-processor,,AWS Lambda,Development
+106,Volume discount adjustment,2026-06-03T00:00:00Z,2026-06-03T23:59:59Z,987654321098,112233445566,Discount,-18.75,0.00,AWS,distribution-CF02,,Amazon CloudFront,CDN
+107,Refund for billing error,2026-06-04T00:00:00Z,2026-06-04T23:59:59Z,987654321098,112233445566,Refund,-15.20,0.00,AWS,bucket-analytics,,Amazon Simple Storage Service,Analytics
+108,NAT Gateway usage,2026-06-05T00:00:00Z,2026-06-05T23:59:59Z,987654321098,998877665544,Usage,63.40,68.00,AWS,nat-0d4e5f6a7b8c9,,Amazon Virtual Private Cloud,QA
+109,S3 storage usage,2026-06-05T00:00:00Z,2026-06-05T23:59:59Z,987654321098,998877665544,Usage,112.60,120.00,AWS,bucket-media-archive,,Amazon Simple Storage Service,Production
+110,Support plan fee,2026-06-06T00:00:00Z,2026-06-06T23:59:59Z,987654321098,998877665544,Fee,199.00,199.00,AWS,support-business,,AWS Support (Business),Shared Services

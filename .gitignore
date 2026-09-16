@@ -216,3 +216,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+
+# Resultados gerados pela conversão (não versionar, cada pessoa gera o seu)
+data/output/*
+!data/output/.gitkeep

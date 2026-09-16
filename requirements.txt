@@ -1,6 +1,6 @@
 pandas
-matplotlib
-seaborn
+streamlit
+plotly
 
 #rodar esse comando no terminal:
 #pip install -r requirements.txt 
