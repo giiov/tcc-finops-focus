@@ -1,7 +1,7 @@
 import base64
 import html
 import os
-import streamlit as st
+import streamlit as st # reload colors
 
 from src.mapping.detector import detectar_formato
 from src.converters.aws_converter import converter_aws
@@ -17,7 +17,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# --- carrega assets visuais ---
+# carrega assets visuais
 with open(os.path.join("src", "logo_nuvem.png"), "rb") as arquivo_logo:
     LOGO_BASE64 = base64.b64encode(arquivo_logo.read()).decode("ascii")
 
@@ -26,7 +26,7 @@ with open(os.path.join("src", "Trap-Black 900.otf"), "rb") as arquivo_fonte:
 
 ICONE_NUVEM = f'<img src="data:image/png;base64,{LOGO_BASE64}" alt="Logo FOCUS">'
 
-# --- estado de sessão: persiste o dataset processado entre reruns ---
+# estado de sessao
 if "df_focus" not in st.session_state:
     st.session_state.df_focus = None
 if "formato_detectado" not in st.session_state:
@@ -34,10 +34,7 @@ if "formato_detectado" not in st.session_state:
 if "nome_arquivo" not in st.session_state:
     st.session_state.nome_arquivo = None
 
-
-# --- CSS global: identidade visual, navbar, componentes ---
-# a base do modo escuro (cores nativas do streamlit) vem do .streamlit/config.toml
-# aqui ajustamos e estendemos os elementos que criamos por conta propria
+# css global
 st.markdown(
     """
     <style>
@@ -52,13 +49,18 @@ st.markdown(
 
     html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
-    /* fundo com gradiente da paleta */
     body,
     [data-testid="stAppViewContainer"] {
         background: linear-gradient(160deg, #190019 0%, #2B124C 65%, #190019 100%) !important;
+        background-image: 
+            linear-gradient(rgba(152, 51, 175, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(152, 51, 175, 0.05) 1px, transparent 1px),
+            linear-gradient(160deg, #190019 0%, #2B124C 65%, #190019 100%) !important;
+        background-size: 30px 30px, 30px 30px, 100% 100% !important;
     }
 
-    /* esconde sidebar, menus e botoes desnecessarios */
+    header[data-testid="stHeader"] { display: none !important; }
+
     [data-testid="stSidebar"],
     [data-testid="collapsedControl"],
     [data-testid="stAppDeployButton"],
@@ -66,19 +68,15 @@ st.markdown(
         display: none !important;
     }
 
-    /* area de conteudo principal */
     [data-testid="stAppViewContainer"] .main .block-container {
         width: 100%;
         max-width: 1280px;
-        padding-top: 0.25rem;
+        padding-top: 0;
         padding-bottom: 4rem;
         padding-left: 2.5rem;
         padding-right: 2.5rem;
     }
 
-    /* ============================================================
-       NAVBAR — tabs do Streamlit reutilizadas como barra superior
-    ============================================================ */
     .stTabs [data-baseweb="tab-list"] {
         background: rgba(20, 5, 32, 0.95);
         backdrop-filter: blur(16px);
@@ -117,9 +115,6 @@ st.markdown(
     .stTabs [data-baseweb="tab-border"] { display: none !important; }
     .stTabs [data-baseweb="tab-panel"] { padding-top: 0 !important; }
 
-    /* ============================================================
-       TIPOGRAFIA E IDENTIDADE
-    ============================================================ */
     .focus-titulo {
         font-family: 'Trap Black', sans-serif;
         font-size: 3.5rem;
@@ -138,13 +133,13 @@ st.markdown(
     .focus-subtitulo {
         color: rgba(243, 232, 239, 0.65);
         font-size: 1rem;
-        margin: 0.6rem 0 0;
+        margin: 0.5rem 0 0;
         line-height: 1.6;
-        max-width: 520px;
+        max-width: 560px;
     }
     .focus-icone {
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         justify-content: center;
         width: 5rem;
         height: 5rem;
@@ -157,36 +152,19 @@ st.markdown(
         display: block;
     }
 
-    /* ============================================================
-       HERO — cabecalho da aba Inicio (pre-upload)
-    ============================================================ */
     .hero-wrapper {
         padding: 2.5rem 0 1.5rem;
-    }
-    .hero-badge {
-        display: inline-flex;
+        display: flex;
         align-items: center;
-        gap: 6px;
-        background: rgba(152, 51, 175, 0.12);
-        border: 1px solid rgba(152, 51, 175, 0.32);
-        border-radius: 100px;
-        padding: 4px 14px;
-        font-size: 0.72rem;
-        font-weight: 600;
-        color: #E6C6DB;
-        letter-spacing: 0.07em;
-        text-transform: uppercase;
-        margin-bottom: 1.25rem;
+        gap: 1.25rem;
     }
+    .hero-texto { display: flex; flex-direction: column; }
 
-    /* ============================================================
-       FLUXO DE TRANSFORMACAO — 4 passos com setas
-    ============================================================ */
     .fluxo-container {
         display: flex;
         align-items: stretch;
         gap: 0;
-        margin: 2rem 0 2.5rem;
+        margin: 0 0 2rem;
         flex-wrap: wrap;
     }
     .fluxo-passo {
@@ -242,18 +220,20 @@ st.markdown(
         align-self: center;
     }
 
-    /* ============================================================
-       UPLOAD AREA
-    ============================================================ */
     [data-testid="stFileUploaderDropzone"] {
         border: 1.5px dashed rgba(152, 51, 175, 0.55) !important;
-        border-radius: 16px !important;
+        border-radius: 12px !important;
         background: rgba(43, 18, 76, 0.28) !important;
         transition: border-color 0.2s ease, background 0.2s ease;
+        padding: 0.5rem 1rem !important;
+        min-height: 0 !important;
     }
     [data-testid="stFileUploaderDropzone"]:hover {
         border-color: #9833AF !important;
         background: rgba(43, 18, 76, 0.48) !important;
+    }
+    [data-testid="stFileUploaderDropzoneInstructions"] {
+        padding: 0.75rem 0 !important;
     }
     .upload-hint {
         font-size: 0.78rem;
@@ -261,16 +241,7 @@ st.markdown(
         margin-top: 0.4rem;
         line-height: 1.5;
     }
-    .upload-label {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: rgba(243, 232, 239, 0.75);
-        margin-bottom: 0.5rem;
-    }
 
-    /* ============================================================
-       STATUS CARD — pos-upload na aba Inicio
-    ============================================================ */
     .status-card {
         background: rgba(43, 18, 76, 0.45);
         border: 1px solid rgba(152, 51, 175, 0.28);
@@ -285,9 +256,6 @@ st.markdown(
         text-transform: uppercase;
         color: #2FBF71;
         margin-bottom: 1.1rem;
-        display: flex;
-        align-items: center;
-        gap: 6px;
     }
     .status-grid {
         display: flex;
@@ -332,9 +300,6 @@ st.markdown(
         line-height: 1.5;
     }
 
-    /* ============================================================
-       SECAO DADOS — cabecalhos, info de entrada, tabela
-    ============================================================ */
     .secao-header {
         display: flex;
         align-items: center;
@@ -374,9 +339,6 @@ st.markdown(
         color: #E6C6DB;
     }
 
-    /* ============================================================
-       COLUNAS FOCUS — lista de tags
-    ============================================================ */
     .focus-columns-list {
         list-style: none;
         margin: 0.5rem 0 1rem;
@@ -386,6 +348,7 @@ st.markdown(
         gap: 6px;
     }
     .focus-columns-list li {
+        display: inline-block;
         background: rgba(95, 45, 145, 0.18);
         border: 1px solid rgba(152, 51, 175, 0.28);
         border-radius: 6px;
@@ -393,7 +356,8 @@ st.markdown(
         font-size: 0.72rem;
         font-weight: 500;
         color: #E6C6DB;
-        white-space: nowrap;
+        word-break: break-word;
+        white-space: normal;
     }
     .focus-columns-list li.missing {
         background: rgba(243, 232, 239, 0.03);
@@ -401,9 +365,6 @@ st.markdown(
         color: rgba(243, 232, 239, 0.25);
     }
 
-    /* ============================================================
-       METRICAS / KPIs
-    ============================================================ */
     [data-testid="stMetric"] {
         background: rgba(43, 18, 76, 0.5);
         border: 1px solid rgba(152, 51, 175, 0.22);
@@ -418,9 +379,21 @@ st.markdown(
     [data-testid="stMetricValue"] { color: #E6C6DB; font-weight: 700; }
     [data-testid="stMetricLabel"] { color: rgba(243, 232, 239, 0.55) !important; }
 
-    /* ============================================================
-       VISUALIZACOES
-    ============================================================ */
+    [data-testid="stPlotlyChart"] {
+        background: rgba(15, 5, 25, 0.65);
+        border: 1px solid rgba(152, 51, 175, 0.25);
+        border-radius: 18px;
+        padding: 0.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        height: 100%;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    [data-testid="stPlotlyChart"]:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6);
+        border-color: rgba(152, 51, 175, 0.45);
+    }
+
     .viz-intro {
         font-size: 0.85rem;
         color: rgba(243, 232, 239, 0.45);
@@ -428,9 +401,6 @@ st.markdown(
         line-height: 1.6;
     }
 
-    /* ============================================================
-       SOBRE — cards de informacao
-    ============================================================ */
     .sobre-card {
         background: rgba(43, 18, 76, 0.38);
         border: 1px solid rgba(152, 51, 175, 0.18);
@@ -475,9 +445,6 @@ st.markdown(
         margin: 3px;
     }
 
-    /* ============================================================
-       DOWNLOAD BUTTON
-    ============================================================ */
     [data-testid="stDownloadButton"] button {
         display: inline-flex;
         align-items: center;
@@ -498,7 +465,23 @@ st.markdown(
 )
 
 
-# --- navegacao: 4 abas superiores funcionam como navbar ---
+# hero principal no topo da pagina (fora das abas)
+st.markdown(
+    f"""
+    <div class="hero-wrapper" style="padding: 1rem 0 1.5rem;">
+        <div class="focus-icone">{ICONE_NUVEM}</div>
+        <div class="hero-texto">
+            <p class="focus-titulo"><span class="destaque">FOCUS</span> Multi&#8209;Cloud</p>
+            <p class="focus-subtitulo">
+                Padronização e análise de custos AWS, GCP, Azure e Oracle em um único padrão.
+            </p>
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+# navegacao
 aba_inicio, aba_dados, aba_viz, aba_sobre = st.tabs([
     ":material/home: Início",
     ":material/table_chart: Dados",
@@ -507,71 +490,11 @@ aba_inicio, aba_dados, aba_viz, aba_sobre = st.tabs([
 ])
 
 
-# =============================================================================
-# ABA 1 — INICIO
-# =============================================================================
+# ── ABA INÍCIO ────────────────────────────────────────────────────────────────
 with aba_inicio:
 
-    # cabecalho: logo + titulo + subtitulo
-    col_logo, col_texto = st.columns([1, 9], gap="small")
-    with col_logo:
-        st.markdown(
-            f'<div class="focus-icone" style="margin-top:2.5rem;">{ICONE_NUVEM}</div>',
-            unsafe_allow_html=True,
-        )
-    with col_texto:
-        st.markdown(
-            """
-            <div class="hero-wrapper">
-                <span class="hero-badge">FinOps Open Cost and Usage Specification</span>
-                <p class="focus-titulo"><span class="destaque">FOCUS</span> Multi&#8209;Cloud</p>
-                <p class="focus-subtitulo">
-                    Receba arquivos de custo de AWS, GCP, Azure ou Oracle e transforme&#8209;os
-                    automaticamente no padrão FOCUS — permitindo comparar e analisar
-                    gastos multi&#8209;cloud em uma estrutura única e consistente.
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    # fluxo de transformacao: 4 passos visuais
-    st.markdown(
-        """
-        <div class="fluxo-container">
-            <div class="fluxo-passo">
-                <div class="fluxo-numero">01</div>
-                <div class="fluxo-label">Arquivo de Entrada</div>
-                <div class="fluxo-desc">CSV de custos do provedor cloud</div>
-            </div>
-            <div class="fluxo-seta">&#8594;</div>
-            <div class="fluxo-passo">
-                <div class="fluxo-numero">02</div>
-                <div class="fluxo-label">Detecção do Provedor</div>
-                <div class="fluxo-desc">Identificação automática por colunas</div>
-            </div>
-            <div class="fluxo-seta">&#8594;</div>
-            <div class="fluxo-passo">
-                <div class="fluxo-numero">03</div>
-                <div class="fluxo-label">Padronização</div>
-                <div class="fluxo-desc">Mapeamento e conversão para FOCUS</div>
-            </div>
-            <div class="fluxo-seta">&#8594;</div>
-            <div class="fluxo-passo fluxo-passo--destaque">
-                <div class="fluxo-numero">04</div>
-                <div class="fluxo-label">Resultado FOCUS</div>
-                <div class="fluxo-desc">Estrutura padronizada, pronta para análise</div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    # area de upload
-    st.markdown(
-        '<p class="upload-label">:material/upload_file: Envie seu arquivo de custos (.csv)</p>',
-        unsafe_allow_html=True,
-    )
+    # upload
+    st.markdown("##### :material/upload_file: Envie seu arquivo de custos (.csv)")
     arquivo_enviado = st.file_uploader(
         "Envie seu arquivo de custos (.csv)",
         type=["csv"],
@@ -582,22 +505,19 @@ with aba_inicio:
         unsafe_allow_html=True,
     )
 
-    # --- processamento do arquivo (logica original preservada na integra) ---
+    # processamento do arquivo
     if arquivo_enviado is not None:
 
-        #salva o arquivo recebido dentro de data/input
         caminho_arquivo = os.path.join("data", "input", arquivo_enviado.name)
         os.makedirs(os.path.dirname(caminho_arquivo), exist_ok=True)
         with open(caminho_arquivo, "wb") as f:
             f.write(arquivo_enviado.getbuffer())
 
-        #reprocessa somente se for um arquivo diferente do que esta em cache
+        # reprocessa
         if st.session_state.nome_arquivo != arquivo_enviado.name:
             try:
-                #detecta o formato automaticamente
                 formato = detectar_formato(caminho_arquivo)
 
-                #escolhe o converter certo
                 if formato == "gcp":
                     df_focus = converter_gcp(caminho_arquivo)
                 elif formato == "aws":
@@ -607,7 +527,6 @@ with aba_inicio:
                 elif formato == "oracle":
                     df_focus = converter_oracle(caminho_arquivo)
 
-                #salva no estado de sessao para usar nas outras abas
                 st.session_state.df_focus = df_focus
                 st.session_state.formato_detectado = formato
                 st.session_state.nome_arquivo = arquivo_enviado.name
@@ -615,8 +534,8 @@ with aba_inicio:
             except Exception as erro:
                 st.error(f"Erro durante a conversão: {erro}")
 
-    # --- card de status pos-upload ---
     if st.session_state.df_focus is not None:
+        # pos-upload
         df = st.session_state.df_focus
         formato = st.session_state.formato_detectado
         nome = st.session_state.nome_arquivo
@@ -658,10 +577,41 @@ with aba_inicio:
             unsafe_allow_html=True,
         )
 
+    else:
+        # pre-upload
+        st.markdown(
+            """
+            <div class="fluxo-container">
+                <div class="fluxo-passo">
+                    <div class="fluxo-numero">01</div>
+                    <div class="fluxo-label">Arquivo de Entrada</div>
+                    <div class="fluxo-desc">CSV de custos do provedor cloud</div>
+                </div>
+                <div class="fluxo-seta">&#8594;</div>
+                <div class="fluxo-passo">
+                    <div class="fluxo-numero">02</div>
+                    <div class="fluxo-label">Detecção do Provedor</div>
+                    <div class="fluxo-desc">Identificação automática por colunas</div>
+                </div>
+                <div class="fluxo-seta">&#8594;</div>
+                <div class="fluxo-passo">
+                    <div class="fluxo-numero">03</div>
+                    <div class="fluxo-label">Padronização</div>
+                    <div class="fluxo-desc">Mapeamento e conversão para FOCUS</div>
+                </div>
+                <div class="fluxo-seta">&#8594;</div>
+                <div class="fluxo-passo fluxo-passo--destaque">
+                    <div class="fluxo-numero">04</div>
+                    <div class="fluxo-label">Resultado FOCUS</div>
+                    <div class="fluxo-desc">Estrutura padronizada, pronta para análise</div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
-# =============================================================================
-# ABA 2 — DADOS
-# =============================================================================
+
+# ── ABA DADOS ─────────────────────────────────────────────────────────────────
 with aba_dados:
 
     if st.session_state.df_focus is None:
@@ -676,7 +626,7 @@ with aba_dados:
         colunas_presentes = [c for c in COLUNAS_OFICIAIS_FOCUS if c in df.columns and df[c].notna().any()]
         colunas_ausentes = [c for c in COLUNAS_OFICIAIS_FOCUS if c not in colunas_presentes]
 
-        # informacoes do arquivo de entrada
+        # arquivo de entrada
         st.markdown(
             '<div class="secao-header"><span class="secao-header__titulo">Arquivo de Entrada</span></div>',
             unsafe_allow_html=True,
@@ -705,7 +655,22 @@ with aba_dados:
             unsafe_allow_html=True,
         )
 
-        # colunas FOCUS disponíveis — exibidas como tags
+        # tabela padronizada
+        st.markdown(
+            '<div class="secao-header" style="margin-top:2rem;"><span class="secao-header__titulo">Dados padronizados FOCUS</span></div>',
+            unsafe_allow_html=True,
+        )
+        st.dataframe(df, use_container_width=True)
+
+        csv_bytes = df.to_csv(index=False).encode("utf-8")
+        st.download_button(
+            "Baixar CSV padronizado",
+            data=csv_bytes,
+            file_name="focus_padronizado.csv",
+            mime="text/csv",
+        )
+
+        # colunas presentes
         st.markdown(":material/check_circle: **Colunas FOCUS disponíveis neste arquivo**")
         itens_presentes = "".join(f"<li>{html.escape(col)}</li>" for col in colunas_presentes)
         st.markdown(
@@ -721,25 +686,8 @@ with aba_dados:
                     unsafe_allow_html=True,
                 )
 
-        # tabela FOCUS padronizada
-        st.markdown(
-            '<div class="secao-header" style="margin-top:2rem;"><span class="secao-header__titulo">Dados padronizados FOCUS</span></div>',
-            unsafe_allow_html=True,
-        )
-        st.dataframe(df, use_container_width=True)
 
-        csv_bytes = df.to_csv(index=False).encode("utf-8")
-        st.download_button(
-            "Baixar CSV padronizado",
-            data=csv_bytes,
-            file_name="focus_padronizado.csv",
-            mime="text/csv",
-        )
-
-
-# =============================================================================
-# ABA 3 — VISUALIZACOES
-# =============================================================================
+# ── ABA VISUALIZAÇÕES ─────────────────────────────────────────────────────────
 with aba_viz:
 
     if st.session_state.df_focus is None:
@@ -747,7 +695,7 @@ with aba_viz:
     else:
         df = st.session_state.df_focus
 
-        # KPIs no topo da aba de visualizacoes (calculos originais preservados)
+        # kpis
         kpis = calcular_kpis(df)
         col_efetivo, col_faturado, col_economia = st.columns([2.5, 1.25, 1.25])
 
@@ -763,25 +711,29 @@ with aba_viz:
             unsafe_allow_html=True,
         )
 
-        # graficos (logica original preservada na integra)
+        # graficos
         graficos = gerar_graficos(df)
 
         if not graficos:
             st.info("Não há dados suficientes neste arquivo para gerar visualizações.")
         else:
-            for i in range(0, len(graficos), 2):
-                par = graficos[i:i + 2]
+            # O grafico temporal ganha destaque ocupando a largura total
+            if "tempo" in graficos:
+                st.plotly_chart(graficos.pop("tempo"), use_container_width=True)
+                st.markdown("<br>", unsafe_allow_html=True) # Espaco sutil
+
+            # Os demais graficos sao dispostos em um grid estruturado de 2 colunas
+            figuras_restantes = list(graficos.values())
+            for i in range(0, len(figuras_restantes), 2):
+                par = figuras_restantes[i:i + 2]
                 colunas_layout = st.columns(len(par))
                 for coluna_layout, fig in zip(colunas_layout, par):
                     coluna_layout.plotly_chart(fig, use_container_width=True)
 
 
-# =============================================================================
-# ABA 4 — SOBRE
-# =============================================================================
+# ── ABA SOBRE ─────────────────────────────────────────────────────────────────
 with aba_sobre:
 
-    # cabecalho da secao sobre
     col_sobre_logo, col_sobre_texto = st.columns([1, 9], gap="small")
     with col_sobre_logo:
         st.markdown(

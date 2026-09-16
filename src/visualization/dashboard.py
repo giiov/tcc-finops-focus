@@ -2,60 +2,48 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
-#colunas de custo que podem virar metrica ("valor") nos graficos, em ordem de preferencia
 COLUNAS_DE_CUSTO = ["BilledCost", "EffectiveCost", "ContractedCost", "ListCost"]
-
-#colunas categoricas que fazem sentido como dimensao de agrupamento, em ordem de prioridade
 COLUNAS_DIMENSAO = ["ProviderName", "ServiceName", "ChargeCategory", "ServiceCategory", "SubAccountId", "BillingAccountId"]
-
-#limite de categorias exibidas por grafico -- acima disso, o restante vira uma barra "Outros"
 MAX_CATEGORIAS = 10
 
-#paleta fixa por coluna de custo -- garante que a mesma cor sempre representa a mesma
-#metrica em todos os graficos, em vez da cor mudar dependendo de quais colunas existem
 CORES_POR_CUSTO = {
-    "BilledCost": "#F2B134",
-    "EffectiveCost": "#2FBF71",
-    "ContractedCost": "#E85D75",
-    "ListCost": "#7C6FF2",
+    "BilledCost":      "#FF33A1", # Rosa Vibrante (combina com o magenta)
+    "EffectiveCost":   "#00F2FE", # Ciano Brilhante (contraste moderno)
+    "ContractedCost":  "#9D4EDD", # Roxo Eletrico
+    "ListCost":        "#FFB142", # Laranja/Dourado
 }
 
 CORES_POR_CATEGORIA = [
-    "#E85D75",
-    "#2FBF71",
-    "#F2B134",
-    "#22A6B3",
-    "#A85BC7",
-    "#F07C3E",
-    "#D94F8A",
-    "#6FAE4F",
-    "#4D7CFE",
-    "#C58A3A",
+    "#FF33A1",
+    "#00F2FE",
+    "#FFB142",
+    "#9D4EDD",
+    "#FF007F",
+    "#00FFCC",
+    "#FF7300",
+    "#3366FF",
+    "#CCFF00",
+    "#B000FF",
 ]
 
-
 def _aplicar_tema(fig):
-    #aplica o tema escuro do Plotly e deixa o fundo transparente,
-    #pra combinar com o fundo escuro do app (nativo, via .streamlit/config.toml)
     fig.update_layout(
         template="plotly_dark",
         paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(255,255,255,0.02)",
         font=dict(family="Inter", color="#d0c9cd"),
-        legend=dict(orientation="h", y=-0.2),
-        margin=dict(t=48, b=16, l=8, r=8),
+        legend=dict(orientation="h", y=-0.15, font=dict(size=11)),
+        margin=dict(t=65, b=20, l=20, r=20),
+        title=dict(font=dict(size=15, color="#FFFFFF"), x=0.02, y=0.95)
     )
-    fig.update_xaxes(gridcolor="#514b50")
-    fig.update_yaxes(gridcolor="#514b50")
+    fig.update_xaxes(gridcolor="#3a2850", zerolinecolor="#4d3b66")
+    fig.update_yaxes(gridcolor="#3a2850", zerolinecolor="#4d3b66")
     return fig
-
 
 def _custos_disponiveis(df_focus):
     return [c for c in COLUNAS_DE_CUSTO if c in df_focus.columns and df_focus[c].notna().any()]
 
-
 def calcular_kpis(df_focus):
-    # Mantem os calculos para possivel uso futuro no app, sem exibi-los atualmente.
     colunas_valor = _custos_disponiveis(df_focus)
     total_faturado = df_focus["BilledCost"].sum() if "BilledCost" in colunas_valor else None
     total_efetivo = df_focus["EffectiveCost"].sum() if "EffectiveCost" in colunas_valor else None
@@ -81,7 +69,6 @@ def calcular_kpis(df_focus):
         "servico_top": servico_top,
     }
 
-
 def _agrupar_com_outros(df_focus, coluna_dimensao, colunas_valor):
     agrupado = df_focus.groupby(coluna_dimensao)[colunas_valor].sum().reset_index()
     agrupado = agrupado.sort_values(colunas_valor[0], ascending=False)
@@ -94,7 +81,6 @@ def _agrupar_com_outros(df_focus, coluna_dimensao, colunas_valor):
     linha_outros = pd.DataFrame([{coluna_dimensao: "Outros", **resto}])
     return pd.concat([principais, linha_outros], ignore_index=True)
 
-
 def grafico_por_dimensao(df_focus, coluna_dimensao):
     colunas_valor = _custos_disponiveis(df_focus)
     if not colunas_valor or coluna_dimensao not in df_focus.columns:
@@ -105,53 +91,40 @@ def grafico_por_dimensao(df_focus, coluna_dimensao):
     agrupado = _agrupar_com_outros(df_focus, coluna_dimensao, colunas_valor)
 
     if coluna_dimensao == "ChargeCategory":
-        # Pie charts representam partes de um todo e nao aceitam valores negativos.
-        # Refunds e credits continuam nos dados, mas sao exibidos pela magnitude.
-        valores_pie = agrupado.copy()
-        valores_pie[colunas_valor[0]] = valores_pie[colunas_valor[0]].abs()
-        fig = px.pie(
-            valores_pie,
-            names=coluna_dimensao,
-            values=colunas_valor[0],
-            hole=0.45,
-            color_discrete_sequence=CORES_POR_CATEGORIA,
-            title=f"Custos por {coluna_dimensao}",
-        )
-        fig.update_traces(textposition="inside", textinfo="percent+label")
-        fig.update_layout(showlegend=True)
+        valores_waterfall = agrupado.copy()
+        col_v = colunas_valor[0]
+        fig = go.Figure(go.Waterfall(
+            orientation="v",
+            measure=["relative"] * len(valores_waterfall),
+            x=valores_waterfall[coluna_dimensao],
+            y=valores_waterfall[col_v],
+            textposition="outside",
+            text=[f"${v:,.0f}" for v in valores_waterfall[col_v]],
+            decreasing={"marker": {"color": "#00F2FE"}}, # Ciano (Reducoes)
+            increasing={"marker": {"color": "#FF33A1"}}, # Rosa (Custos)
+            totals={"marker": {"color": "#9D4EDD"}} # Roxo Eletrico (Total)
+        ))
+        fig.update_layout(title=f"Custos por {coluna_dimensao}", waterfallgap=0.3)
+        fig.update_yaxes(tickprefix="$", tickformat=",.2f")
         return _aplicar_tema(fig)
 
     if coluna_dimensao == "ServiceName":
         agrupado_melted = agrupado.melt(
-            id_vars=coluna_dimensao,
-            value_vars=colunas_valor,
-            var_name="Tipo de Custo",
-            value_name="Valor",
+            id_vars=coluna_dimensao, value_vars=colunas_valor,
+            var_name="Tipo de Custo", value_name="Valor",
         )
         fig = px.bar(
-            agrupado_melted,
-            x="Valor",
-            y=coluna_dimensao,
-            color="Tipo de Custo",
-            color_discrete_map=CORES_POR_CUSTO,
-            barmode="group",
-            orientation="h",
-            title=f"Custos por {coluna_dimensao}",
+            agrupado_melted, x="Valor", y=coluna_dimensao,
+            color="Tipo de Custo", color_discrete_map=CORES_POR_CUSTO,
+            barmode="group", orientation="h", title=f"Custos por {coluna_dimensao}",
         )
         fig.update_xaxes(tickprefix="$", tickformat=",.2f")
-        fig.update_layout(
-            xaxis_title="Valor",
-            yaxis_title=coluna_dimensao,
-            bargap=0.2,
-            height=620,
-            margin=dict(l=150, r=20, t=40, b=40),
-        )
+        fig.update_layout(xaxis_title="Valor", yaxis_title=coluna_dimensao, bargap=0.2, height=450)
         return _aplicar_tema(fig)
 
     if coluna_dimensao == "SubAccountId":
         categorias = agrupado[coluna_dimensao].tolist()
         fig = go.Figure()
-
         for coluna_valor in colunas_valor:
             valores = agrupado[coluna_valor].tolist()
             x_linhas = []
@@ -161,63 +134,52 @@ def grafico_por_dimensao(df_focus, coluna_dimensao):
                 y_linhas.extend([categoria, categoria, None])
 
             cor = CORES_POR_CUSTO[coluna_valor]
-            fig.add_trace(
-                go.Scatter(
-                    x=x_linhas,
-                    y=y_linhas,
-                    mode="lines",
-                    line=dict(color=cor, width=2),
-                    name=coluna_valor,
-                    legendgroup=coluna_valor,
-                    hoverinfo="skip",
-                    showlegend=False,
-                )
-            )
-            fig.add_trace(
-                go.Scatter(
-                    x=valores,
-                    y=categorias,
-                    mode="markers",
-                    marker=dict(color=cor, size=10),
-                    name=coluna_valor,
-                    legendgroup=coluna_valor,
-                    customdata=valores,
-                    hovertemplate=(
-                        f"{coluna_dimensao}: %{{y}}<br>"
-                        f"{coluna_valor}: $%{{x:,.2f}}<extra></extra>"
-                    ),
-                )
-            )
-
-        fig.update_layout(
-            title=f"Custos por {coluna_dimensao}",
-            xaxis_title="Valor",
-            yaxis_title=coluna_dimensao,
-            height=620,
-            margin=dict(l=150, r=20, t=48, b=40),
-        )
+            fig.add_trace(go.Scatter(
+                x=x_linhas, y=y_linhas, mode="lines",
+                line=dict(color=cor, width=2), name=coluna_valor,
+                legendgroup=coluna_valor, hoverinfo="skip", showlegend=False,
+            ))
+            fig.add_trace(go.Scatter(
+                x=valores, y=categorias, mode="markers",
+                marker=dict(color=cor, size=10), name=coluna_valor,
+                legendgroup=coluna_valor, customdata=valores,
+                hovertemplate=f"{coluna_dimensao}: %{{y}}<br>{coluna_valor}: $%{{x:,.2f}}<extra></extra>",
+            ))
+        fig.update_layout(title=f"Custos por {coluna_dimensao}", xaxis_title="Valor", yaxis_title=coluna_dimensao, height=450)
         fig.update_xaxes(tickprefix="$", tickformat=",.2f", rangemode="tozero")
         return _aplicar_tema(fig)
 
-    agrupado_melted = agrupado.melt(
-        id_vars=coluna_dimensao,
-        value_vars=colunas_valor,
-        var_name="Tipo de Custo",
-        value_name="Valor",
-    )
+    if coluna_dimensao == "BillingAccountId":
+        if len(colunas_valor) >= 2:
+            eixo_x = colunas_valor[0]
+            eixo_y = colunas_valor[1]
+            fig = px.scatter(
+                agrupado, x=eixo_x, y=eixo_y, text=coluna_dimensao,
+                color_discrete_sequence=["#FF33A1"], title=f"Custos por {coluna_dimensao}",
+            )
+            fig.update_traces(marker=dict(size=12, line=dict(width=1.5, color="#00F2FE")), textposition="top center", textfont=dict(size=9))
+            fig.update_xaxes(tickprefix="$", tickformat=",.2f", title=eixo_x)
+            fig.update_yaxes(tickprefix="$", tickformat=",.2f", title=eixo_y)
+        else:
+            col_valor = colunas_valor[0]
+            fig = px.scatter(
+                agrupado, x=coluna_dimensao, y=col_valor, size=col_valor,
+                text=coluna_dimensao, color_discrete_sequence=["#FF33A1"], title=f"Custos por {coluna_dimensao}",
+            )
+            fig.update_traces(marker=dict(line=dict(width=1.5, color="#00F2FE")), textposition="top center", textfont=dict(size=9))
+            fig.update_yaxes(tickprefix="$", tickformat=",.2f")
+        return _aplicar_tema(fig)
 
+    agrupado_melted = agrupado.melt(
+        id_vars=coluna_dimensao, value_vars=colunas_valor,
+        var_name="Tipo de Custo", value_name="Valor",
+    )
     fig = px.bar(
-        agrupado_melted,
-        x=coluna_dimensao,
-        y="Valor",
-        color="Tipo de Custo",
-        color_discrete_map=CORES_POR_CUSTO,
-        barmode="group",
-        title=f"Custos por {coluna_dimensao}",
+        agrupado_melted, x=coluna_dimensao, y="Valor", color="Tipo de Custo",
+        color_discrete_map=CORES_POR_CUSTO, barmode="group", title=f"Custos por {coluna_dimensao}",
     )
     fig.update_yaxes(tickprefix="$", tickformat=",.2f")
     return _aplicar_tema(fig)
-
 
 def grafico_evolucao_temporal(df_focus, coluna_data="ChargePeriodStart"):
     colunas_valor = _custos_disponiveis(df_focus)
@@ -233,37 +195,29 @@ def grafico_evolucao_temporal(df_focus, coluna_data="ChargePeriodStart"):
     agrupado = df_tempo.groupby(coluna_data)[colunas_valor].sum().reset_index()
 
     agrupado_melted = agrupado.melt(
-        id_vars=coluna_data,
-        value_vars=colunas_valor,
-        var_name="Tipo de Custo",
-        value_name="Valor",
+        id_vars=coluna_data, value_vars=colunas_valor,
+        var_name="Tipo de Custo", value_name="Valor",
     )
-
     fig = px.area(
-        agrupado_melted,
-        x=coluna_data,
-        y="Valor",
-        color="Tipo de Custo",
-        color_discrete_map=CORES_POR_CUSTO,
-        title="Evolução de custos ao longo do tempo",
+        agrupado_melted, x=coluna_data, y="Valor", color="Tipo de Custo",
+        color_discrete_map=CORES_POR_CUSTO, title="Evolução de custos ao longo do tempo",
     )
     fig.update_traces(line=dict(width=2))
     fig.update_yaxes(tickprefix="$", tickformat=",.2f")
+    fig.update_layout(height=350)
     return _aplicar_tema(fig)
 
-
 def gerar_graficos(df_focus):
-    graficos = []
-
+    graficos = {}
     fig_tempo = grafico_evolucao_temporal(df_focus)
     if fig_tempo is not None:
-        graficos.append(fig_tempo)
+        graficos['tempo'] = fig_tempo
 
     for coluna in COLUNAS_DIMENSAO:
         if coluna == "ProviderName" and df_focus.get("ProviderName", pd.Series(dtype=object)).nunique() <= 1:
             continue
         fig = grafico_por_dimensao(df_focus, coluna)
         if fig is not None:
-            graficos.append(fig)
+            graficos[coluna] = fig
 
     return graficos
