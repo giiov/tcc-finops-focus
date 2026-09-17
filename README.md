@@ -55,6 +55,6 @@ A proposta é transformar diferentes formatos de dados em uma estrutura comum, f
 
 | Integrante | Redes |
 |------------|-------|
-| Giovana Cipulo | [GitHub]() · [LinkedIn](https://www.linkedin.com/in/giocipulo)|
-| Antonella Cobianchi | [GitHub](https://github.com/antonellapruc31) · [LinkedIn](https://www.linkedin.com/in/antonella-cobianchi) |
+| Giovana Cipulo | [GitHub](https://github.com/giiov) · [LinkedIn](https://www.linkedin.com/in/giocipulo)|
+| Antonella Cobianchi | [GitHub](https://github.com/antonellapruc31) · [LinkedIn](https://www.linkedin.com/in/antonella-cobianchi-505710370/) |
 | Bruno Holanda | [GitHub](https://github.com/brunohlnd) · [LinkedIn](https://www.linkedin.com/in/bhb-holanda) |
