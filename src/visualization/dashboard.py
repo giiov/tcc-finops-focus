@@ -5,10 +5,11 @@ import plotly.graph_objects as go
 COLUNAS_DE_CUSTO = ["BilledCost", "EffectiveCost", "ContractedCost", "ListCost"]
 COLUNAS_DIMENSAO = ["ProviderName", "ServiceName", "ChargeCategory", "ServiceCategory", "SubAccountId", "BillingAccountId"]
 MAX_CATEGORIAS = 10
+COLUNAS_IGNORADAS_SE_UNICAS = ["ProviderName", "BillingAccountId"]
 
 CORES_POR_CUSTO = {
-    "BilledCost":      "#FF33A1", # Rosa Vibrante (combina com o magenta)
-    "EffectiveCost":   "#00F2FE", # Ciano Brilhante (contraste moderno)
+    "BilledCost":      "#FF33A1", # Rosa Vibrante
+    "EffectiveCost":   "#00F2FE", # Ciano Brilhante
     "ContractedCost":  "#9D4EDD", # Roxo Eletrico
     "ListCost":        "#FFB142", # Laranja/Dourado
 }
@@ -120,10 +121,11 @@ def grafico_por_dimensao(df_focus, coluna_dimensao):
         )
         fig.update_xaxes(tickprefix="$", tickformat=",.2f")
         fig.update_layout(xaxis_title="Valor", yaxis_title=coluna_dimensao, bargap=0.2, height=450)
+        fig.update_yaxes(autorange="reversed")
         return _aplicar_tema(fig)
 
     if coluna_dimensao == "SubAccountId":
-        categorias = agrupado[coluna_dimensao].tolist()
+        categorias = agrupado[coluna_dimensao].astype(str).tolist()
         fig = go.Figure()
         for coluna_valor in colunas_valor:
             valores = agrupado[coluna_valor].tolist()
@@ -146,7 +148,9 @@ def grafico_por_dimensao(df_focus, coluna_dimensao):
                 hovertemplate=f"{coluna_dimensao}: %{{y}}<br>{coluna_valor}: $%{{x:,.2f}}<extra></extra>",
             ))
         fig.update_layout(title=f"Custos por {coluna_dimensao}", xaxis_title="Valor", yaxis_title=coluna_dimensao, height=450)
+        fig.update_yaxes(type="category")
         fig.update_xaxes(tickprefix="$", tickformat=",.2f", rangemode="tozero")
+        fig.update_yaxes(autorange="reversed")
         return _aplicar_tema(fig)
 
     if coluna_dimensao == "BillingAccountId":
@@ -214,7 +218,7 @@ def gerar_graficos(df_focus):
         graficos['tempo'] = fig_tempo
 
     for coluna in COLUNAS_DIMENSAO:
-        if coluna == "ProviderName" and df_focus.get("ProviderName", pd.Series(dtype=object)).nunique() <= 1:
+        if coluna in COLUNAS_IGNORADAS_SE_UNICAS and df_focus.get(coluna, pd.Series(dtype=object)).nunique() <= 1:
             continue
         fig = grafico_por_dimensao(df_focus, coluna)
         if fig is not None:

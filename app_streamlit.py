@@ -13,6 +13,7 @@ from src.schemas.focus_schema import COLUNAS_OFICIAIS_FOCUS
 
 st.set_page_config(
     page_title="FOCUS Multi-Cloud",
+    page_icon="src/logo_nuvem.png",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
