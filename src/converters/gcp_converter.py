@@ -6,43 +6,14 @@ from src.schemas.focus_schema import COLUNAS_OFICIAIS_FOCUS
 
 
 def converter_gcp(caminho_arquivo):
-    """
-    Converte o Google Cloud Standard Usage Cost Export
-    para o subconjunto de colunas utilizado pelo projeto,
-    baseado no FOCUS v1.4.
-
-    Observação:
-    O Google Cloud Standard Export não fornece informação
-    suficiente para preencher semanticamente todos os campos
-    obrigatórios do FOCUS. Campos sem correspondência segura
-    permanecem nulos.
-    """
-
-    # ============================================================
-    # 1. LEITURA
-    # ============================================================
 
     df = pd.read_csv(caminho_arquivo)
 
-
-    # ============================================================
-    # 2. MAPEAMENTOS DIRETOS
-    # ============================================================
-
     df = df.rename(columns=GCP_MAPPING)
-
-
-    # ============================================================
-    # 3. PROVEDOR
-    # ============================================================
 
     df["ServiceProviderName"] = "Google Cloud"
     df["HostProviderName"] = "Google Cloud"
 
-
-    # ============================================================
-    # 4. CAMPOS NÃO DISPONÍVEIS DE FORMA SEGURA
-    # ============================================================
 
     # O Standard Export não fornece um nome da conta de
     # faturamento correspondente a BillingAccountName.
@@ -60,11 +31,6 @@ def converter_gcp(caminho_arquivo):
     # suficiente para ResourceId e ResourceType.
     df["ResourceId"] = None
     df["ResourceType"] = None
-
-
-    # ============================================================
-    # 5. BILLING PERIOD
-    # ============================================================
 
     if "invoice.month" in df.columns:
 
@@ -86,10 +52,6 @@ def converter_gcp(caminho_arquivo):
         df["BillingPeriodEnd"] = None
 
 
-    # ============================================================
-    # 6. CHARGE PERIOD
-    # ============================================================
-
     if "ChargePeriodStart" in df.columns:
 
         df["ChargePeriodStart"] = pd.to_datetime(
@@ -105,11 +67,6 @@ def converter_gcp(caminho_arquivo):
             errors="coerce",
             utc=True
         )
-
-
-    # ============================================================
-    # 7. CHARGE CATEGORY
-    # ============================================================
 
     MAPA_CHARGE_CATEGORY = {
         "regular": "Usage",
@@ -138,27 +95,7 @@ def converter_gcp(caminho_arquivo):
 
         df["ChargeCategory"] = None
 
-
-    # ============================================================
-    # 8. CHARGE CLASS
-    # ============================================================
-
-    # ChargeClass = Correction deve representar correção
-    # de período previamente faturado.
-    #
-    # adjustment_info.type sozinho informa o tipo do ajuste,
-    # mas não é suficiente para provar que a cobrança pertence
-    # a um período previamente fechado.
-    #
-    # Portanto, nesta conversão do Standard Export,
-    # não inferimos Correction apenas pelo tipo do ajuste.
-
     df["ChargeClass"] = None
-
-
-    # ============================================================
-    # 9. FUNÇÃO PARA CALCULAR COST + CREDITS
-    # ============================================================
 
     def calcular_custo_com_creditos(linha):
 
@@ -231,10 +168,6 @@ def converter_gcp(caminho_arquivo):
         return custo_base + soma_creditos
 
 
-    # ============================================================
-    # 10. BILLED COST
-    # ============================================================
-
     if "cost" in df.columns:
 
         df["BilledCost"] = df.apply(
@@ -246,14 +179,8 @@ def converter_gcp(caminho_arquivo):
 
         df["BilledCost"] = None
 
-
-    # ============================================================
-    # 11. EFFECTIVE COST
-    # ============================================================
-
     # O mapeamento publicado pelo Google para seu FOCUS Export
     # utiliza cost + credits.amount também para EffectiveCost.
-    #
     # Mantemos a mesma transformação para o subconjunto do projeto.
 
     if "cost" in df.columns:
@@ -268,12 +195,7 @@ def converter_gcp(caminho_arquivo):
         df["EffectiveCost"] = None
 
 
-    # ============================================================
-    # 12. CONTRACTED COST
-    # ============================================================
-
     # Mapeamento oficial publicado pelo Google:
-    #
     # cost -> ContractedCost
 
     if "cost" in df.columns:
@@ -286,11 +208,6 @@ def converter_gcp(caminho_arquivo):
     else:
 
         df["ContractedCost"] = None
-
-
-    # ============================================================
-    # 13. LIST COST
-    # ============================================================
 
     # Mapeamento oficial:
     #
@@ -307,17 +224,6 @@ def converter_gcp(caminho_arquivo):
 
         df["ListCost"] = None
 
-
-    # ============================================================
-    # 14. PRICING QUANTITY
-    # ============================================================
-
-    # Mapeamento oficial:
-    #
-    # price.pricing_unit_quantity
-    #           ->
-    # PricingQuantity
-
     if "PricingQuantity" in df.columns:
 
         df["PricingQuantity"] = pd.to_numeric(
@@ -329,22 +235,11 @@ def converter_gcp(caminho_arquivo):
 
         df["PricingQuantity"] = None
 
-
-    # ============================================================
-    # 15. PRICING UNIT
-    # ============================================================
-
     # Mapeamento oficial:
-    #
     # price.unit -> PricingUnit
 
     if "PricingUnit" not in df.columns:
         df["PricingUnit"] = None
-
-
-    # ============================================================
-    # 16. TAGS
-    # ============================================================
 
     def converter_labels_para_tags(
         labels_raw
@@ -428,20 +323,10 @@ def converter_gcp(caminho_arquivo):
 
         df["Tags"] = json.dumps({})
 
-
-    # ============================================================
-    # 17. GARANTE A ESTRUTURA DO SCHEMA DO PROJETO
-    # ============================================================
-
     for coluna in COLUNAS_OFICIAIS_FOCUS:
 
         if coluna not in df.columns:
             df[coluna] = None
-
-
-    # ============================================================
-    # 18. RETORNO
-    # ============================================================
 
     return df[
         COLUNAS_OFICIAIS_FOCUS

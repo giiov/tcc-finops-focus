@@ -6,26 +6,8 @@ from src.schemas.focus_schema import COLUNAS_OFICIAIS_FOCUS
 
 
 def converter_azure(caminho_arquivo):
-    """
-    Converte Azure Cost Management Cost Details
-    para o subconjunto utilizado pelo projeto,
-    baseado no FOCUS v1.4.
-
-    O conversor evita inferências quando a fonte Azure
-    não fornece informação suficiente para determinar
-    semanticamente um atributo FOCUS.
-    """
-
-    # ============================================================
-    # 1. LEITURA
-    # ============================================================
 
     df = pd.read_csv(caminho_arquivo)
-
-
-    # ============================================================
-    # 2. COMPATIBILIDADE ENTRE VERSÕES DO COST DETAILS
-    # ============================================================
 
     # Alguns exports utilizam BillingCurrencyCode
     # em vez de BillingCurrency.
@@ -62,25 +44,10 @@ def converter_azure(caminho_arquivo):
     ):
         df["Quantity"] = df["UsageQuantity"]
 
-
-    # ============================================================
-    # 3. MAPEAMENTOS DIRETOS
-    # ============================================================
-
     df = df.rename(columns=AZURE_MAPPING)
-
-
-    # ============================================================
-    # 4. PROVEDOR
-    # ============================================================
 
     df["ServiceProviderName"] = "Microsoft"
     df["HostProviderName"] = "Microsoft"
-
-
-    # ============================================================
-    # 5. INVOICE ISSUER
-    # ============================================================
 
     # Para custos Azure diretos tratados pelo projeto.
     #
@@ -89,11 +56,6 @@ def converter_azure(caminho_arquivo):
     # não representam necessariamente o mesmo conceito.
 
     df["InvoiceIssuerName"] = "Microsoft"
-
-
-    # ============================================================
-    # 6. BILLING PERIOD
-    # ============================================================
 
     if "BillingPeriodStart" in df.columns:
 
@@ -118,7 +80,6 @@ def converter_azure(caminho_arquivo):
 
         # O fim recebido pelo Cost Details é tratado
         # como inclusivo.
-        #
         # O schema do projeto utiliza limite exclusivo.
         df["BillingPeriodEnd"] = (
             billing_end
@@ -128,11 +89,6 @@ def converter_azure(caminho_arquivo):
     else:
 
         df["BillingPeriodEnd"] = None
-
-
-    # ============================================================
-    # 7. CHARGE PERIOD
-    # ============================================================
 
     if "ChargePeriodStart" in df.columns:
 
@@ -153,10 +109,6 @@ def converter_azure(caminho_arquivo):
         df["ChargePeriodStart"] = None
         df["ChargePeriodEnd"] = None
 
-
-    # ============================================================
-    # 8. CHARGE CATEGORY
-    # ============================================================
 
     MAPA_CHARGE_CATEGORY = {
         "usage": "Usage",
@@ -187,34 +139,7 @@ def converter_azure(caminho_arquivo):
         df["ChargeCategory"] = None
 
 
-    # IMPORTANTE:
-    #
-    # Refund não é automaticamente classificado.
-    #
-    # Um Refund pode estar relacionado a Usage,
-    # Purchase, Tax etc.
-    #
-    # Apenas ChargeType = Refund não fornece
-    # informação suficiente para determinar
-    # seguramente a ChargeCategory correspondente.
-
-
-    # ============================================================
-    # 9. CHARGE CLASS
-    # ============================================================
-
-    # Correction só deve ser utilizado quando sabemos
-    # que a cobrança corrige um período de faturamento
-    # previamente fechado.
-    #
-    # ChargeType sozinho não comprova essa condição.
-
     df["ChargeClass"] = None
-
-
-    # ============================================================
-    # 10. BILLED COST
-    # ============================================================
 
     def calcular_billed_cost(linha):
 
@@ -273,11 +198,6 @@ def converter_azure(caminho_arquivo):
 
         df["BilledCost"] = None
 
-
-    # ============================================================
-    # 11. EFFECTIVE COST
-    # ============================================================
-
     def calcular_effective_cost(linha):
 
         billed_cost = pd.to_numeric(
@@ -311,22 +231,6 @@ def converter_azure(caminho_arquivo):
             )
         )
 
-
-        # --------------------------------------------------------
-        # Purchase de Reservation/Savings Plan
-        # --------------------------------------------------------
-        #
-        # A cobrança existe em BilledCost.
-        #
-        # Entretanto, o EffectiveCost do compromisso
-        # deve ser reconhecido no uso ao qual ele é
-        # posteriormente alocado.
-        #
-        # Por isso:
-        #
-        # BilledCost    = valor da compra
-        # EffectiveCost = 0
-
         if (
             tipo == "purchase"
             and eh_compromisso
@@ -334,33 +238,11 @@ def converter_azure(caminho_arquivo):
             return 0.0
 
 
-        # --------------------------------------------------------
-        # Usage coberto por Reservation/Savings Plan
-        # --------------------------------------------------------
-        #
-        # O Azure Actual Cost utilizado como fonte pelo
-        # projeto não contém sozinho a parcela amortizada
-        # necessária para reconstruir o EffectiveCost.
-        #
-        # BilledCost já será 0.
-        #
-        # Portanto, preservamos o valor disponível.
-        #
-        # Essa é uma limitação conhecida da fonte.
-        #
-        # Para reconstrução amortizada completa seria
-        # necessário utilizar também Azure Amortized Cost.
-
         if (
             tipo == "usage"
             and eh_compromisso
         ):
             return billed_cost
-
-
-        # --------------------------------------------------------
-        # Demais cobranças
-        # --------------------------------------------------------
 
         return billed_cost
 
@@ -369,11 +251,6 @@ def converter_azure(caminho_arquivo):
         calcular_effective_cost,
         axis=1
     )
-
-
-    # ============================================================
-    # 12. PRICING QUANTITY
-    # ============================================================
 
     if "PricingQuantity" in df.columns:
 
@@ -386,24 +263,8 @@ def converter_azure(caminho_arquivo):
 
         df["PricingQuantity"] = None
 
-
-    # ============================================================
-    # 13. PRICING UNIT
-    # ============================================================
-
     if "PricingUnit" not in df.columns:
         df["PricingUnit"] = None
-
-
-    # ============================================================
-    # 14. REGRAS DE PRICING PARA TAX
-    # ============================================================
-
-    # Tax não representa uma quantidade de pricing
-    # de um recurso/serviço.
-    #
-    # Portanto, PricingQuantity e PricingUnit
-    # são removidos dessas linhas.
 
     mascara_tax = (
         df["ChargeCategory"] == "Tax"
@@ -418,17 +279,6 @@ def converter_azure(caminho_arquivo):
         mascara_tax,
         "PricingUnit"
     ] = None
-
-
-    # ============================================================
-    # 15. CONTRACTED COST
-    # ============================================================
-
-    # Para linhas em que UnitPrice e PricingQuantity
-    # estão disponíveis:
-    #
-    # ContractedCost =
-    # UnitPrice × PricingQuantity
 
     if (
         "UnitPrice" in df.columns
@@ -459,17 +309,6 @@ def converter_azure(caminho_arquivo):
             df["BilledCost"]
         )
 
-
-    # ============================================================
-    # 16. LIST COST
-    # ============================================================
-
-    # Quando PaygCostInBillingCurrency está disponível,
-    # ele foi mapeado para ListCost.
-    #
-    # Isso representa o custo calculado utilizando
-    # preço Pay-As-You-Go/lista disponível na fonte.
-
     if "ListCost" in df.columns:
 
         df["ListCost"] = pd.to_numeric(
@@ -492,18 +331,8 @@ def converter_azure(caminho_arquivo):
             df["ContractedCost"]
         )
 
-
-    # ============================================================
-    # 17. SERVICE NAME
-    # ============================================================
-
     if "ServiceName" not in df.columns:
         df["ServiceName"] = None
-
-
-    # ============================================================
-    # 18. SERVICE CATEGORY
-    # ============================================================
 
     # Classificação utilizando as categorias
     # do FOCUS adotadas pelo projeto.
@@ -560,11 +389,6 @@ def converter_azure(caminho_arquivo):
 
         df["ServiceCategory"] = "Other"
 
-
-    # ============================================================
-    # 19. TAGS
-    # ============================================================
-
     def converter_tags_azure(tags_raw):
 
         if (
@@ -576,13 +400,6 @@ def converter_azure(caminho_arquivo):
         bruto = str(
             tags_raw
         ).strip()
-
-
-        # Alguns exports podem fornecer:
-        #
-        # "environment":"production","team":"finops"
-        #
-        # sem as chaves externas.
 
         if not bruto.startswith("{"):
             bruto = (
@@ -632,20 +449,10 @@ def converter_azure(caminho_arquivo):
 
         df["Tags"] = json.dumps({})
 
-
-    # ============================================================
-    # 20. GARANTE O SCHEMA SELECIONADO
-    # ============================================================
-
     for coluna in COLUNAS_OFICIAIS_FOCUS:
 
         if coluna not in df.columns:
             df[coluna] = None
-
-
-    # ============================================================
-    # 21. RETORNO
-    # ============================================================
 
     return df[
         COLUNAS_OFICIAIS_FOCUS
