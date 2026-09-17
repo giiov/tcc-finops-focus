@@ -1,13 +1,18 @@
 AZURE_MAPPING = {
-    # Descrição e Período de Cobrança
+    # Descrição
     "ProductName": "ChargeDescription",
+
+    # Períodos
     "Date": "ChargePeriodStart",
     "BillingPeriodStartDate": "BillingPeriodStart",
 
-    # Contas
+    # Conta de faturamento
     "BillingProfileId": "BillingAccountId",
     "BillingProfileName": "BillingAccountName",
+
+    # Subconta / assinatura
     "SubscriptionId": "SubAccountId",
+    "SubscriptionName": "SubAccountName",
 
     # Recursos
     "ResourceId": "ResourceId",
@@ -16,13 +21,13 @@ AZURE_MAPPING = {
     # Moeda
     "BillingCurrency": "BillingCurrency",
 
-    # Serviços e Recursos
-    "PublisherName": "PublisherName",
+    # Serviço
+    "ConsumedService": "ServiceName",
 
     # Custos
-    # Alguns exports simplificados do Azure usam estes nomes equivalentes.
-    "PreTaxCost": "CostInBillingCurrency",
-    "ResourceRate": "UnitPrice",
-    "UsageQuantity": "Quantity",
     "PaygCostInBillingCurrency": "ListCost",
+
+    # Pricing
+    "Quantity": "PricingQuantity",
+    "UnitOfMeasure": "PricingUnit",
 }
