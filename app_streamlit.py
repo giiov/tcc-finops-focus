@@ -90,6 +90,7 @@ st.markdown(
         z-index: 100;
         margin-bottom: 0;
     }
+
     .stTabs [data-baseweb="tab"] {
         font-family: 'Inter', sans-serif;
         font-weight: 600;
@@ -100,18 +101,22 @@ st.markdown(
         background: transparent !important;
         transition: color 0.18s ease;
     }
+
     .stTabs [data-baseweb="tab"]:hover {
         color: #E6C6DB !important;
         background: transparent !important;
     }
+
     .stTabs [aria-selected="true"] {
         color: #9833AF !important;
         background: transparent !important;
     }
+
     .stTabs [data-baseweb="tab-highlight"] {
         background-color: #9833AF !important;
         height: 2px;
     }
+
     .stTabs [data-baseweb="tab-border"] { display: none !important; }
     .stTabs [data-baseweb="tab-panel"] { padding-top: 0 !important; }
 
@@ -124,12 +129,14 @@ st.markdown(
         margin: 0;
         line-height: 1.05;
     }
+
     .focus-titulo .destaque {
         background: linear-gradient(90deg, #9833AF, #B24A82);
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
     }
+
     .focus-subtitulo {
         color: rgba(243, 232, 239, 0.65);
         font-size: 1rem;
@@ -137,6 +144,7 @@ st.markdown(
         line-height: 1.6;
         max-width: 560px;
     }
+
     .focus-icone {
         display: flex;
         align-items: center;
@@ -145,6 +153,7 @@ st.markdown(
         height: 5rem;
         flex-shrink: 0;
     }
+
     .focus-icone img {
         width: 100%;
         height: 100%;
@@ -158,6 +167,7 @@ st.markdown(
         align-items: center;
         gap: 1.25rem;
     }
+
     .hero-texto { display: flex; flex-direction: column; }
 
     .fluxo-container {
@@ -167,6 +177,7 @@ st.markdown(
         margin: 0 0 2rem;
         flex-wrap: wrap;
     }
+
     .fluxo-passo {
         flex: 1;
         min-width: 130px;
@@ -181,14 +192,17 @@ st.markdown(
         text-align: center;
         transition: border-color 0.2s ease, background 0.2s ease;
     }
+
     .fluxo-passo:hover {
         border-color: rgba(152, 51, 175, 0.45);
         background: rgba(43, 18, 76, 0.65);
     }
+
     .fluxo-passo--destaque {
         background: rgba(95, 45, 145, 0.22);
         border-color: rgba(152, 51, 175, 0.45);
     }
+
     .fluxo-numero {
         font-size: 0.62rem;
         font-weight: 700;
@@ -197,18 +211,21 @@ st.markdown(
         color: rgba(230, 198, 219, 0.4);
         margin-bottom: 0.2rem;
     }
+
     .fluxo-label {
         font-size: 0.78rem;
         font-weight: 600;
         color: #E6C6DB;
         line-height: 1.3;
     }
+
     .fluxo-desc {
         font-size: 0.68rem;
         color: rgba(243, 232, 239, 0.38);
         line-height: 1.4;
         margin-top: 2px;
     }
+
     .fluxo-seta {
         display: flex;
         align-items: center;
@@ -228,13 +245,16 @@ st.markdown(
         padding: 0.5rem 1rem !important;
         min-height: 0 !important;
     }
+
     [data-testid="stFileUploaderDropzone"]:hover {
         border-color: #9833AF !important;
         background: rgba(43, 18, 76, 0.48) !important;
     }
+
     [data-testid="stFileUploaderDropzoneInstructions"] {
         padding: 0.75rem 0 !important;
     }
+
     .upload-hint {
         font-size: 0.78rem;
         color: rgba(243, 232, 239, 0.38);
@@ -249,6 +269,7 @@ st.markdown(
         padding: 1.5rem 2rem;
         margin: 1.5rem 0;
     }
+
     .status-header {
         font-size: 0.68rem;
         font-weight: 700;
@@ -257,12 +278,14 @@ st.markdown(
         color: #2FBF71;
         margin-bottom: 1.1rem;
     }
+
     .status-grid {
         display: flex;
         gap: 2.5rem;
         flex-wrap: wrap;
         align-items: flex-start;
     }
+
     .status-item__label {
         font-size: 0.67rem;
         font-weight: 500;
@@ -271,12 +294,14 @@ st.markdown(
         text-transform: uppercase;
         letter-spacing: 0.07em;
     }
+
     .status-item__value {
         font-size: 1.65rem;
         font-weight: 700;
         color: #E6C6DB;
         line-height: 1.2;
     }
+
     .provider-badge {
         display: inline-flex;
         align-items: center;
@@ -288,11 +313,13 @@ st.markdown(
         font-weight: 700;
         color: #E6C6DB;
     }
+
     .status-divider {
         border: none;
         border-top: 1px solid rgba(152, 51, 175, 0.14);
         margin: 1.1rem 0 0.9rem;
     }
+
     .status-nav-hint {
         font-size: 0.8rem;
         color: rgba(243, 232, 239, 0.4);
@@ -308,6 +335,7 @@ st.markdown(
         padding-bottom: 0.55rem;
         border-bottom: 1px solid rgba(152, 51, 175, 0.18);
     }
+
     .secao-header__titulo {
         font-size: 0.72rem;
         font-weight: 700;
@@ -315,6 +343,7 @@ st.markdown(
         text-transform: uppercase;
         color: rgba(243, 232, 239, 0.5);
     }
+
     .input-info-grid {
         display: flex;
         gap: 2rem;
@@ -325,6 +354,7 @@ st.markdown(
         border-radius: 12px;
         margin-bottom: 1.5rem;
     }
+
     .input-info-item__label {
         font-size: 0.67rem;
         color: rgba(243, 232, 239, 0.4);
@@ -333,6 +363,7 @@ st.markdown(
         letter-spacing: 0.07em;
         margin-bottom: 2px;
     }
+
     .input-info-item__value {
         font-size: 0.92rem;
         font-weight: 600;
@@ -347,6 +378,7 @@ st.markdown(
         flex-wrap: wrap;
         gap: 6px;
     }
+
     .focus-columns-list li {
         display: inline-block;
         background: rgba(95, 45, 145, 0.18);
@@ -359,6 +391,7 @@ st.markdown(
         word-break: break-word;
         white-space: normal;
     }
+
     .focus-columns-list li.missing {
         background: rgba(243, 232, 239, 0.03);
         border-color: rgba(243, 232, 239, 0.08);
@@ -372,10 +405,12 @@ st.markdown(
         padding: 1rem 1.25rem;
         transition: border-color 0.18s ease, transform 0.18s ease;
     }
+
     [data-testid="stMetric"]:hover {
         border-color: rgba(152, 51, 175, 0.55);
         transform: translateY(-2px);
     }
+
     [data-testid="stMetricValue"] { color: #E6C6DB; font-weight: 700; }
     [data-testid="stMetricLabel"] { color: rgba(243, 232, 239, 0.55) !important; }
 
@@ -388,6 +423,7 @@ st.markdown(
         height: 100%;
         transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     }
+
     [data-testid="stPlotlyChart"]:hover {
         transform: translateY(-2px);
         box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6);
@@ -408,6 +444,7 @@ st.markdown(
         padding: 1.5rem 1.75rem;
         margin-bottom: 1rem;
     }
+
     .sobre-card__titulo {
         font-size: 0.68rem;
         font-weight: 700;
@@ -416,12 +453,14 @@ st.markdown(
         color: #9833AF;
         margin-bottom: 0.75rem;
     }
+
     .sobre-card__texto {
         font-size: 0.9rem;
         color: rgba(243, 232, 239, 0.75);
         line-height: 1.75;
         margin: 0;
     }
+
     .provider-tag {
         display: inline-block;
         background: rgba(43, 18, 76, 0.6);
@@ -433,6 +472,7 @@ st.markdown(
         color: #E6C6DB;
         margin: 3px;
     }
+
     .tech-tag {
         display: inline-block;
         background: rgba(95, 45, 145, 0.14);
@@ -450,6 +490,7 @@ st.markdown(
         align-items: center;
         gap: 8px;
     }
+
     [data-testid="stDownloadButton"] button::before {
         content: "";
         width: 16px;
@@ -540,7 +581,7 @@ with aba_inicio:
         formato = st.session_state.formato_detectado
         nome = st.session_state.nome_arquivo
 
-        provedores = df["ProviderName"].dropna().unique().tolist()
+        provedores = df["ServiceProviderName"].dropna().unique().tolist()
         provider_display = html.escape(", ".join(provedores)) if provedores else formato.upper()
         colunas_presentes = [c for c in COLUNAS_OFICIAIS_FOCUS if c in df.columns and df[c].notna().any()]
 
@@ -621,7 +662,7 @@ with aba_dados:
         formato = st.session_state.formato_detectado
         nome = st.session_state.nome_arquivo
 
-        provedores = df["ProviderName"].dropna().unique().tolist()
+        provedores = df["ServiceProviderName"].dropna().unique().tolist()
         provider_display = html.escape(", ".join(provedores)) if provedores else formato.upper()
         colunas_presentes = [c for c in COLUNAS_OFICIAIS_FOCUS if c in df.columns and df[c].notna().any()]
         colunas_ausentes = [c for c in COLUNAS_OFICIAIS_FOCUS if c not in colunas_presentes]
@@ -740,6 +781,7 @@ with aba_sobre:
             f'<div class="focus-icone" style="margin-top:1.5rem;">{ICONE_NUVEM}</div>',
             unsafe_allow_html=True,
         )
+
     with col_sobre_texto:
         st.markdown(
             """
@@ -770,6 +812,7 @@ with aba_sobre:
             """,
             unsafe_allow_html=True,
         )
+
         st.markdown(
             """
             <div class="sobre-card">
@@ -785,6 +828,7 @@ with aba_sobre:
             """,
             unsafe_allow_html=True,
         )
+
         st.markdown(
             """
             <div class="sobre-card">
@@ -814,6 +858,7 @@ with aba_sobre:
             """,
             unsafe_allow_html=True,
         )
+
         st.markdown(
             """
             <div class="sobre-card">
@@ -828,6 +873,7 @@ with aba_sobre:
             """,
             unsafe_allow_html=True,
         )
+
         st.markdown(
             """
             <div class="sobre-card">
