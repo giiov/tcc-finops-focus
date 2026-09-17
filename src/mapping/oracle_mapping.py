@@ -1,11 +1,15 @@
 ORACLE_MAPPING = {
-    # Descrição e Período de Cobrança
+    # Descrição
     "product/description": "ChargeDescription",
+
+    # Período da cobrança
     "lineItem/intervalUsageStart": "ChargePeriodStart",
     "lineItem/intervalUsageEnd": "ChargePeriodEnd",
 
-    # Contas
+    # Conta de faturamento
     "cost/subscriptionId": "BillingAccountId",
+
+    # Subconta / tenancy
     "lineItem/TenantId": "SubAccountId",
 
     # Moeda
@@ -14,7 +18,11 @@ ORACLE_MAPPING = {
     # Custos
     "cost/myCost": "BilledCost",
 
-    # Serviços e Recursos
+    # Pricing
+    "usage/billedQuantity": "PricingQuantity",
+    "cost/skuUnitDescription": "PricingUnit",
+
+    # Serviço e recurso
     "product/resourceId": "ResourceId",
     "product/service": "ServiceName",
 }
