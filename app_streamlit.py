@@ -11,6 +11,7 @@ from src.converters.azure_converter import converter_azure
 from src.converters.oracle_converter import converter_oracle
 from src.visualization.dashboard import gerar_graficos, calcular_kpis
 from src.schemas.focus_schema import COLUNAS_OFICIAIS_FOCUS
+from src.assistente.ui.chat import renderizar_chat
 
 st.set_page_config(page_title="FOCUS Multi-Cloud", layout="wide", initial_sidebar_state="expanded")
 
@@ -468,3 +469,5 @@ if arquivo_enviado is not None:
 else:
     with secao_dataset:
         st.caption("Envie um arquivo para ver os detalhes do dataset aqui.")
+
+renderizar_chat()
