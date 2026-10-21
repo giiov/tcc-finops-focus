@@ -1,4 +1,0 @@
-lineItem/referenceNo,lineItem/TenantId,lineItem/intervalUsageStart,lineItem/intervalUsageEnd,product/service,product/resourceId,cost/subscriptionId,cost/productSku,product/description,cost/unitPrice,cost/myCost,cost/currencyCode,lineItem/isCorrection,lineItem/backReferenceNo,tags/Oracle-Tags.CreatedBy,tags/finops.environment
-REF-001,ocid1.tenancy.oc1..sub001,2026-07-15T00:00:00Z,2026-07-15T01:00:00Z,Compute,ocid1.instance.oc1..vm01,SUB-ORCL-001,B90000,Compute - Standard E4 OCPU,0.5,12.00,BRL,FALSE,,antonella@etec.br,producao
-REF-002,ocid1.tenancy.oc1..sub001,2026-07-16T00:00:00Z,2026-07-16T01:00:00Z,Object Storage,ocid1.bucket.oc1..bkt01,SUB-ORCL-001,B90010,Object Storage - Standard,0.02,3.50,BRL,FALSE,,antonella@etec.br,homologacao
-REF-003,ocid1.tenancy.oc1..sub001,2026-07-17T00:00:00Z,2026-07-17T01:00:00Z,Compute,ocid1.instance.oc1..vm01,SUB-ORCL-001,B90000,Correcao de cobranca anterior,0.5,-12.00,BRL,TRUE,REF-001,,

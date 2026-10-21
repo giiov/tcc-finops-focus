@@ -65,9 +65,11 @@ CSS_CHAT = """
 /* A janelinha do chat que abre ao clicar na bolinha.
    overflow-y: auto = se a tela for baixa, a janela rola em vez de cortar */
 [data-testid="stPopoverBody"] {
-    width: min(420px, 92vw);
-    max-height: 82vh;
-    overflow-y: auto;
+    width: min(650px, 92vw);
+    height: 75vh;
+    max-height: 85vh;
+    overflow: auto;
+    resize: both;
 }
 </style>
 """
