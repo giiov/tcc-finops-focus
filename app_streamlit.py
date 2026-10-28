@@ -1,6 +1,8 @@
 import base64
+import hashlib
 import html
 import os
+import tempfile
 import streamlit as st # reload colors
 
 from src.mapping.detector import detectar_formato
@@ -35,6 +37,8 @@ if "formato_detectado" not in st.session_state:
     st.session_state.formato_detectado = None
 if "nome_arquivo" not in st.session_state:
     st.session_state.nome_arquivo = None
+if "hash_arquivo" not in st.session_state:
+    st.session_state.hash_arquivo = None
 
 # css global
 st.markdown(
@@ -551,13 +555,21 @@ with aba_inicio:
     # processamento do arquivo
     if arquivo_enviado is not None:
 
-        caminho_arquivo = os.path.join("data", "input", arquivo_enviado.name)
-        os.makedirs(os.path.dirname(caminho_arquivo), exist_ok=True)
-        with open(caminho_arquivo, "wb") as f:
-            f.write(arquivo_enviado.getbuffer())
+        # identifica o upload pelo nome + hash do conteudo, assim um CSV corrigido
+        # com o mesmo nome (ou ate com o mesmo tamanho) e reprocessado
+        conteudo = arquivo_enviado.getvalue()
+        hash_atual = hashlib.sha256(conteudo).hexdigest()
 
-        # reprocessa
-        if st.session_state.nome_arquivo != arquivo_enviado.name:
+        # reprocessa somente quando o arquivo realmente mudou
+        if (
+            st.session_state.nome_arquivo != arquivo_enviado.name
+            or st.session_state.hash_arquivo != hash_atual
+        ):
+            # arquivo temporario: nao fica guardado no servidor e nao colide entre usuarios
+            with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as arquivo_temp:
+                arquivo_temp.write(conteudo)
+                caminho_arquivo = arquivo_temp.name
+
             try:
                 formato = detectar_formato(caminho_arquivo)
 
@@ -569,13 +581,24 @@ with aba_inicio:
                     df_focus = converter_azure(caminho_arquivo)
                 elif formato == "oracle":
                     df_focus = converter_oracle(caminho_arquivo)
+                else:
+                    raise ValueError(
+                        "Formato não reconhecido. Envie um CSV de custos da AWS, "
+                        "GCP, Azure ou Oracle Cloud."
+                    )
 
                 st.session_state.df_focus = df_focus
                 st.session_state.formato_detectado = formato
                 st.session_state.nome_arquivo = arquivo_enviado.name
+                st.session_state.hash_arquivo = hash_atual
 
             except Exception as erro:
                 st.error(f"Erro durante a conversão: {erro}")
+
+            finally:
+                # apaga o temporario mesmo se a conversao falhar
+                if os.path.exists(caminho_arquivo):
+                    os.remove(caminho_arquivo)
 
     if st.session_state.df_focus is not None:
         # pos-upload
