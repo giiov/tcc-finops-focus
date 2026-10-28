@@ -1,16 +1,26 @@
 GCP_MAPPING = {
-    #Descrição e Período de Cobrança
+    # Identificação da conta
+    "billing_account_id": "BillingAccountId",
+
+    # Subconta / projeto
+    "project.id": "SubAccountId",
+    "project.name": "SubAccountName",
+
+    # Moeda
+    "currency": "BillingCurrency",
+
+    # Serviço e descrição da cobrança
+    "service.description": "ServiceName",
     "sku.description": "ChargeDescription",
+
+    # Período da cobrança
     "usage_start_time": "ChargePeriodStart",
     "usage_end_time": "ChargePeriodEnd",
 
-    #Contas
-    "billing_account_id": "BillingAccountId",
-    "project.id": "SubAccountId",
+    # Pricing
+    "price.pricing_unit_quantity": "PricingQuantity",
+    "price.unit": "PricingUnit",
 
-    #Moeda
-    "currency": "BillingCurrency",
-
-    #Serviços e Recursos
-    "service.description": "ServiceName",
+    # Custo de lista
+    "cost_at_list": "ListCost",
 }

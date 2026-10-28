@@ -1,18 +1,36 @@
-COLUNAS_OFICIAIS_FOCUS = [
-    "ChargeDescription", "ChargePeriodStart", "ChargePeriodEnd",
-    "ProviderName", "PublisherName", "BillingAccountId",
-    "BillingAccountName",   
-    "SubAccountId",
-    "ChargeCategory",
-    "ChargeClass",           
-    "BilledCost", "EffectiveCost",
-    "ContractedCost",        
-    "ListCost",               
-    "InvoiceIssuerName",     
+COLUNAS_MANDATORY_FOCUS = [
+    "BilledCost",
+    "BillingAccountId",
+    "BillingAccountName",
     "BillingCurrency",
-    "BillingPeriodStart",     
-    "BillingPeriodEnd",       
-    "ResourceId", "ResourceType", "ServiceName",
-    "ServiceCategory",       
-    "Tags"
+    "BillingPeriodStart",
+    "BillingPeriodEnd",
+    "ChargeCategory",
+    "ChargeClass",
+    "ChargeDescription",
+    "ChargePeriodStart",
+    "ChargePeriodEnd",
+    "ContractedCost",
+    "EffectiveCost",
+    "HostProviderName",
+    "InvoiceIssuerName",
+    "ListCost",
+    "PricingQuantity",
+    "PricingUnit",
+    "ServiceProviderName",
+    "ServiceCategory",
+    "ServiceName",
 ]
+
+COLUNAS_CONDITIONAL_FOCUS = [
+    "ResourceId",
+    "ResourceType",
+    "SubAccountId",
+    "SubAccountName",
+    "Tags",
+]
+
+COLUNAS_OFICIAIS_FOCUS = (
+    COLUNAS_MANDATORY_FOCUS
+    + COLUNAS_CONDITIONAL_FOCUS
+)

@@ -1,23 +1,36 @@
 AWS_MAPPING = {
-    #Descrição e Período de Cobrança
+    # Descrição
     "lineItem/LineItemDescription": "ChargeDescription",
+
+    # Período da cobrança
     "lineItem/UsageStartDate": "ChargePeriodStart",
     "lineItem/UsageEndDate": "ChargePeriodEnd",
 
-    #Contas de Faturamento e Entidades
-    "bill/PayerAccountId": "BillingAccountId",
-    "lineItem/UsageAccountId": "SubAccountId",
-    "bill/BillingEntity": "PublisherName",
+    # Período de faturamento
+    "bill/BillingPeriodStartDate": "BillingPeriodStart",
+    "bill/BillingPeriodEndDate": "BillingPeriodEnd",
 
-    #Custos e Moeda
-    "lineItem/UnblendedCost": "BilledCost",
-    "pricing/publicOnDemandCost": "EffectiveCost",
+    # Conta de faturamento
+    "bill/PayerAccountId": "BillingAccountId",
+    "bill/PayerAccountName": "BillingAccountName",
+
+    # Subconta / conta de uso
+    "lineItem/UsageAccountId": "SubAccountId",
+
+    # Moeda
     "lineItem/CurrencyCode": "BillingCurrency",
 
-    #Serviços e Recursos
+    # Custo faturado
+    "lineItem/UnblendedCost": "BilledCost",
+
+    # Pricing
+    "lineItem/UsageAmount": "PricingQuantity",
+    "pricing/unit": "PricingUnit",
+
+    # Serviço e recurso
     "lineItem/ResourceId": "ResourceId",
     "product/ProductName": "ServiceName",
 
-    #Etiquetas (Tags)
-    "resourceTags/user:Environment": "Tags"
+    # Emissor da fatura
+    "bill/InvoicingEntity": "InvoiceIssuerName",
 }
