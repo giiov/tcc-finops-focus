@@ -114,7 +114,7 @@ def conteudo_chat():
     )
 
     with col_titulo:
-        st.markdown("**Assistente FOCUS**")
+        st.markdown("**ADA, sua assistente FinOps!**")
 
     #reserva o espaço para o botão de limpar
     with col_limpar:
@@ -223,6 +223,6 @@ def renderizar_chat():
     with st.container(key=CHAVE_CONTAINER):
         with st.popover(
             ":material/forum:",
-            help="Assistente FOCUS"
+            help="Assistente Ada"
         ):
             conteudo_chat()
