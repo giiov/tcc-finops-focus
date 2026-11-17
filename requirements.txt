@@ -1,8 +1,10 @@
 pandas
-streamlit
 plotly
 groq
 python-dotenv
+fastapi
+uvicorn[standard]
+python-multipart
 
 #rodar esse comando no terminal:
-#pip install -r requirements.txt 
+#pip install -r requirements.txt
