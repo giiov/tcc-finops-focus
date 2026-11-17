@@ -43,3 +43,17 @@ def tabela_para_registros(df, limite):
     #transforma as primeiras linhas da tabela em uma lista de dicionários que vira json
     #passar por to_json resolve NaN, NaT e datas, que o json normal do python não aceita
     return json.loads(df.head(limite).to_json(orient="records", date_format="iso"))
+
+def custo_por_servico(df_focus, limite=10):
+    #agrupa as linhas pelo nome do seviço e soma o BilledCost de cada grup
+    #usa a tabela inteira, não só as 100 linhas de amostra
+    soma = df_focus.groupby("ServiceName")["BilledCost"].sum()
+
+    #ordena do maior para o menor e fica só com os limites primeiros, para melhorar a elegibilidade
+    soma = soma.sort_values(ascending=False).head(limite)
+
+    #devolve no formato do char.js: rotulos (eixo x) e valores (altura das barras)
+    return {
+        "rotulos": list(soma.index),
+        "valores": [round(float(v), 2) for v in soma.values],
+    }
