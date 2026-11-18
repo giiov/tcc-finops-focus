@@ -8,7 +8,21 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from src.assistente.ai.assistente import ErroAssistente, responder
-from src.conversao import FormatoNaoReconhecido, converter_arquivo, tabela_para_registros, custo_por_servico
+
+from src.conversao import (
+    FormatoNaoReconhecido,
+    converter_arquivo,
+    custo_por_categoria,
+    custo_por_tipo_recurso,
+    custo_por_dia,
+    custo_por_servico,
+    custo_por_tag,
+    custo_por_tipo_cobranca,
+    resumo_custos,
+    tabela_para_registros,
+    tipos_de_custo,
+    top_recursos,
+)
 
 #mesmo limite do frontend (50 MB); o servidor confere de novo porque o frontend pode ser burlado
 LIMITE_MB = 50
@@ -70,6 +84,14 @@ def converter(arquivo: UploadFile = File(...)):
         "amostra": tabela_para_registros(df_focus, LINHAS_AMOSTRA),
         "graficos": {
             "custo_por_servico": custo_por_servico(df_focus),
+            "custo_por_dia": custo_por_dia(df_focus),
+            "custo_por_categoria": custo_por_categoria(df_focus),
+            "custo_por_tipo_cobranca": custo_por_tipo_cobranca(df_focus),
+            "tipos_de_custo": tipos_de_custo(df_focus),
+            "custo_por_tipo_recurso": custo_por_tipo_recurso(df_focus),
+            "top_recursos": top_recursos(df_focus),
+            "custo_por_tag": custo_por_tag(df_focus),
+            "resumo": resumo_custos(df_focus),
         },
     }
 
