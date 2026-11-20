@@ -42,12 +42,12 @@ def responder(historico):
     #os erros abaixo vem da biblioteca do GROQ. Os mais epsecíficos vindo primeiro
     except groq.AuthenticationError as erro:
         raise ErroAssistente(
-            "A chave de API do Groq foi recusada. Confira p GROQ_API_KEY no .env."
+            "A chave de API do Groq foi recusada. Confira a GROQ_API_KEY no .env."
         ) from erro
 
     except groq.RateLimitError as erro:
         raise ErroAssistente(
-            "O limite gratuito do Groq foi atingido por agora."
+            "O limite gratuito do Groq foi atingido por agora. "
             "Aguarde um pouco e tente de novo!"
         ) from erro
 
