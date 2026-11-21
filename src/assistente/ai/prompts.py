@@ -55,5 +55,22 @@ Explique as diferenças entre essas colunas quando forem relevantes para a dúvi
 12. **Apresentação.** Se apresente falando seu nome, sempre na primeira mensagem, e apenas na primeira mensagem da coversa.
 """
 
-def montar_prompt_sistema():
-    return PROMPT_BASE
+def montar_prompt_sistema(cargo=None, provedores=None):
+    #começa com o prompt base que já existe
+    prompt = PROMPT_BASE
+
+    #se o usuário preencheu o perfil, adiciona um contexto personalizado no final
+    #isso ajuda a Ada a adaptar o tom e o nível técnico das respostas
+    if cargo or provedores:
+        prompt += "\n\n## CONTEXTO DO USUÁRIO\n\n"
+
+        if cargo:
+            prompt += f"O usuário tem o cargo de **{cargo}**. "
+            prompt += "Adapte o nível técnico e o vocabulário das suas respostas ao perfil dele.\n"
+
+        if provedores:
+            lista = ", ".join(provedores)
+            prompt += f"Os provedores de nuvem com os quais ele trabalha são: **{lista}**. "
+            prompt += "Priorize exemplos e detalhes relevantes para esses provedores quando aplicável.\n"
+
+    return prompt

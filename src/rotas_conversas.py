@@ -35,6 +35,9 @@ class NovaMensagem(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True)
     #mesmo limite da caixa de texto do front (maxLength=2000)
     content: str = Field(min_length=1, max_length=2000)
+    #perfil do usuário: opcionais, pois quem não preencheu o perfil ainda pode usar o chat
+    cargo: str | None = Field(default=None, max_length=100)
+    provedores: list[str] | None = Field(default=None)
 
 
 @router.get("")
@@ -146,7 +149,11 @@ def enviar_mensagem(
     anteriores = list(reversed(resposta.data))
 
     try:
-        texto = responder(anteriores + [{"role": "user", "content": pedido.content}])
+        texto = responder(
+            anteriores + [{"role": "user", "content": pedido.content}],
+            cargo=pedido.cargo,
+            provedores=pedido.provedores,
+)
     except ErroAssistente as erro:
         #as mensagens do ErroAssistente já foram escritas para o usuário ler
         raise HTTPException(status_code=503, detail=str(erro))

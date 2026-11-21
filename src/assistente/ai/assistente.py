@@ -17,11 +17,10 @@ class ErroAssistente(Exception):
     #erro com mensagem pronta
     pass
 
-def responder(historico):
-    #envia a conversa para a IA e devolve o texto da resposta
-
+def responder(historico, cargo=None, provedores=None):
+    #passa o perfil do usuário para o prompt; se não vier nada, o prompt base é usado normalmente
     mensagens = [
-        {"role": "system", "content": montar_prompt_sistema()}
+        {"role": "system", "content": montar_prompt_sistema(cargo, provedores)}
     ] + historico[-MAX_MENSAGEM_HISTORICO:]
 
     try:
