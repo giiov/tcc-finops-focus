@@ -49,12 +49,13 @@ def converter(arquivo: UploadFile = File(...)):
     if not (arquivo.filename or "").lower().endswith(".csv"):
         raise HTTPException(status_code=400, detail="Envie um arquivo com extensão .csv")
 
-    conteudo = arquivo.file.read()
-    
     #lê no máximo 1 byte a mais que o limite: se esse byte extra existir, o arquivo passou do limite
     #assim um arquivo gigante nunca é carregado inteiro na memória (o render grátis tem 512 MB)
     limite_bytes = LIMITE_MB * 1024 * 1024
     conteudo = arquivo.file.read(limite_bytes + 1)
+
+    if len(conteudo) > limite_bytes:
+        raise HTTPException(status_code=413, detail=f"O arquivo passa do limite de {LIMITE_MB} MB.")
 
     if len(conteudo) > limite_bytes:
         raise HTTPException(status_code=413, detail=f"O arquivo passa do limite de {LIMITE_MB} MB.")
