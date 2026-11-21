@@ -3,9 +3,10 @@ import tempfile
 from typing import Literal
 
 import pandas as pd
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+from src.autenticacao import UsuarioAtual, usuario_atual
 
 from src.assistente.ai.assistente import ErroAssistente, responder
 from src.conversao import FormatoNaoReconhecido, converter_arquivo, tabela_para_registros
@@ -35,6 +36,11 @@ app.add_middleware(
 def status():
     #rota para testar rápido se a api está de pé
     return {"status": "ok"}
+
+@app.get("/eu")
+def eu(usuario: UsuarioAtual = Depends(usuario_atual)):
+    #devolve o id de quem está logado; serve para o front (e para testes) confirmarem o token
+    return {"id": usuario.id}
 
 
 #def comum (e não async def): o pandas é bloqueante, e assim o fastapi roda a função em outra thread
