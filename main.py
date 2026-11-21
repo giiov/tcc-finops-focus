@@ -7,7 +7,20 @@ from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.autenticacao import UsuarioAtual, usuario_atual
-from src.conversao import FormatoNaoReconhecido, converter_arquivo, tabela_para_registros
+from src.conversao import (
+    FormatoNaoReconhecido,
+    converter_arquivo,
+    custo_por_categoria,
+    custo_por_dia,
+    custo_por_servico,
+    custo_por_tag,
+    custo_por_tipo_cobranca,
+    custo_por_tipo_recurso,
+    resumo_custos,
+    tabela_para_registros,
+    tipos_de_custo,
+    top_recursos,
+)
 from src.rotas_conversas import router as rotas_conversas
 
 #lê o .env antes de qualquer outra coisa; no render não há .env e isso não faz nada
@@ -82,4 +95,15 @@ def converter(arquivo: UploadFile = File(...)):
         "total_linhas": len(df_focus),
         "colunas": list(df_focus.columns),
         "amostra": tabela_para_registros(df_focus, LINHAS_AMOSTRA),
+        "graficos": {
+            "custo_por_servico": custo_por_servico(df_focus),
+            "custo_por_dia": custo_por_dia(df_focus),
+            "custo_por_categoria": custo_por_categoria(df_focus),
+            "custo_por_tipo_cobranca": custo_por_tipo_cobranca(df_focus),
+            "tipos_de_custo": tipos_de_custo(df_focus),
+            "custo_por_tipo_recurso": custo_por_tipo_recurso(df_focus),
+            "top_recursos": top_recursos(df_focus),
+            "custo_por_tag": custo_por_tag(df_focus),
+            "resumo": resumo_custos(df_focus),
+        },
     }
