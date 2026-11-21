@@ -1,8 +1,12 @@
 import os
 import tempfile
 
-import pandas as pd
 from dotenv import load_dotenv
+
+# lê o .env antes de qualquer outra coisa; no render não há .env e isso não faz nada
+load_dotenv()
+
+import pandas as pd
 from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -22,9 +26,6 @@ from src.conversao import (
     top_recursos,
 )
 from src.rotas_conversas import router as rotas_conversas
-
-#lê o .env antes de qualquer outra coisa; no render não há .env e isso não faz nada
-load_dotenv()
 
 #mesmo limite do frontend (50 MB); o servidor confere de novo porque o frontend pode ser burlado
 LIMITE_MB = 50
