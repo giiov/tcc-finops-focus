@@ -20,7 +20,7 @@ app = FastAPI(title="FOCUS Multi-Cloud API")
 #CORS: o navegador só deixa o site em localhost:5173 (vite) falar com a api em localhost:8000
 #se a api não autorizar essa origem. FRONTEND_URLS permite acrescentar o endereço do vercel depois
 origens = ["http://localhost:5173", "http://127.0.0.1:5173"]
-origens += [u for u in os.getenv("FRONTEND_URLS", "").split(",") if u]
+origens += [u.strip() for u in os.getenv("FRONTEND_URLS", "").split(",") if u.strip()]
 
 app.add_middleware(
     CORSMiddleware,
