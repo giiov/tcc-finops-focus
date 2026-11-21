@@ -9,7 +9,9 @@ from pydantic import BaseModel, Field
 from src.autenticacao import UsuarioAtual, usuario_atual
 
 from src.assistente.ai.assistente import ErroAssistente, responder
+
 from src.conversao import FormatoNaoReconhecido, converter_arquivo, tabela_para_registros
+from src.rotas_conversas import router as rotas_conversas
 
 #mesmo limite do frontend (50 MB); o servidor confere de novo porque o frontend pode ser burlado
 LIMITE_MB = 50
@@ -31,6 +33,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(rotas_conversas)
 
 @app.get("/")
 def status():
