@@ -1,14 +1,10 @@
 import os
 import tempfile
-from typing import Literal
 
 import pandas as pd
 from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
 from src.autenticacao import UsuarioAtual, usuario_atual
-
-from src.assistente.ai.assistente import ErroAssistente, responder
 
 from src.conversao import FormatoNaoReconhecido, converter_arquivo, tabela_para_registros
 from src.rotas_conversas import router as rotas_conversas
@@ -48,7 +44,7 @@ def eu(usuario: UsuarioAtual = Depends(usuario_atual)):
 
 #def comum (e não async def): o pandas é bloqueante, e assim o fastapi roda a função em outra thread
 #sem travar as outras requisições
-@app.post("/converter")
+@app.post("/converter", dependencies=[Depends(usuario_atual)])
 def converter(arquivo: UploadFile = File(...)):
     if not (arquivo.filename or "").lower().endswith(".csv"):
         raise HTTPException(status_code=400, detail="Envie um arquivo com extensão .csv")
@@ -83,31 +79,3 @@ def converter(arquivo: UploadFile = File(...)):
         "colunas": list(df_focus.columns),
         "amostra": tabela_para_registros(df_focus, LINHAS_AMOSTRA),
     }
-
-
-#o pydantic confere o formato do json que chega, antes de a nossa função rodar
-#role só aceita "user" e "assistant": assim ninguém consegue mandar uma mensagem "system" para trocar as instruções da Ada
-class Mensagem(BaseModel):
-    role: Literal["user", "assistant"]
-    #o limite é folgado porque as respostas da Ada também voltam aqui como histórico
-    content: str = Field(min_length=1, max_length=10000)
-
-
-class PedidoAssistente(BaseModel):
-    mensagens: list[Mensagem] = Field(min_length=1, max_length=50)
-
-
-#def comum pelo mesmo motivo do /converter: a chamada ao Groq é bloqueante
-@app.post("/assistente")
-def assistente(pedido: PedidoAssistente):
-    #a conversa precisa terminar numa pergunta do usuário, é a ela que a Ada vai responder
-    if pedido.mensagens[-1].role != "user":
-        raise HTTPException(status_code=400, detail="A última mensagem precisa ser do usuário.")
-
-    try:
-        texto = responder([m.model_dump() for m in pedido.mensagens])
-    except ErroAssistente as erro:
-        #as mensagens do ErroAssistente já foram escritas para o usuário ler (chave recusada, limite, sem internet...)
-        raise HTTPException(status_code=503, detail=str(erro))
-
-    return {"resposta": texto}
