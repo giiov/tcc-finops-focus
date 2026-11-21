@@ -63,9 +63,6 @@ def converter(arquivo: UploadFile = File(...)):
     if len(conteudo) > limite_bytes:
         raise HTTPException(status_code=413, detail=f"O arquivo passa do limite de {LIMITE_MB} MB.")
 
-    if len(conteudo) > limite_bytes:
-        raise HTTPException(status_code=413, detail=f"O arquivo passa do limite de {LIMITE_MB} MB.")
-
     #os conversores recebem um caminho de arquivo, então salvamos o upload numa pasta temporária
     #o "with" apaga a pasta (e o csv) sozinho no fim, mesmo se der erro
     with tempfile.TemporaryDirectory() as pasta:
