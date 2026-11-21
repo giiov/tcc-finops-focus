@@ -8,11 +8,18 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from src.autenticacao import UsuarioAtual, usuario_atual
 
+from src.assistente.ai.assistente import MAX_MENSAGEM_HISTORICO, ErroAssistente, responder
+
 router = APIRouter(prefix="/conversas", tags=["conversas"])
 
 #mesmo título padrão do banco (db/003): enquanto a conversa tiver ele, o título ainda não foi definido
 TITULO_PADRAO = "Nova conversa"
 
+#o título automático é o começo da primeira pergunta
+TAMANHO_TITULO = 50
+
+#mesmo limite do banco (db/004) para o texto de uma mensagem
+LIMITE_CONTEUDO = 10000
 
 #str_strip_whitespace tira os espaços das pontas antes de validar: "   " vira "" e é recusado
 class NovaConversa(BaseModel):
@@ -23,6 +30,11 @@ class NovaConversa(BaseModel):
 class RenomearConversa(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True)
     titulo: str = Field(min_length=1, max_length=100)
+
+class NovaMensagem(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+    #mesmo limite da caixa de texto do front (maxLength=2000)
+    content: str = Field(min_length=1, max_length=2000)
 
 
 @router.get("")
@@ -76,3 +88,89 @@ def apagar_conversa(conversa_id: UUID, usuario: UsuarioAtual = Depends(usuario_a
     )
     if not resposta.data:
         raise HTTPException(status_code=404, detail="Conversa não encontrada.")
+    
+def _titulo_a_partir_do_texto(texto: str) -> str:
+    #junta quebras de linha e espaços repetidos, e corta se for longo
+    limpo = " ".join(texto.split())
+    if len(limpo) <= TAMANHO_TITULO:
+        return limpo
+    return limpo[:TAMANHO_TITULO].rstrip() + "…"
+
+
+def _buscar_conversa(usuario: UsuarioAtual, conversa_id: UUID) -> dict:
+    resposta = (
+        usuario.banco.table("conversas")
+        .select("id, titulo")
+        .eq("id", str(conversa_id))
+        .execute()
+    )
+    if not resposta.data:
+        raise HTTPException(status_code=404, detail="Conversa não encontrada.")
+    return resposta.data[0]
+
+
+@router.get("/{conversa_id}/mensagens")
+def listar_mensagens(conversa_id: UUID, usuario: UsuarioAtual = Depends(usuario_atual)):
+    _buscar_conversa(usuario, conversa_id)
+
+    #ordenamos por id, e não por criado_em: mensagens gravadas juntas têm o mesmo horário
+    resposta = (
+        usuario.banco.table("mensagens")
+        .select("id, role, content, criado_em")
+        .eq("conversa_id", str(conversa_id))
+        .order("id")
+        .execute()
+    )
+    return resposta.data
+
+
+#def comum pelo mesmo motivo do /converter: a chamada ao Groq e ao supabase é bloqueante
+@router.post("/{conversa_id}/mensagens")
+def enviar_mensagem(
+    conversa_id: UUID,
+    pedido: NovaMensagem,
+    usuario: UsuarioAtual = Depends(usuario_atual),
+):
+    conversa = _buscar_conversa(usuario, conversa_id)
+
+    #memória da Ada: as últimas mensagens desta conversa, lidas do banco (da mais nova para a mais
+    #antiga) e depois invertidas para ficarem em ordem cronológica
+    resposta = (
+        usuario.banco.table("mensagens")
+        .select("role, content")
+        .eq("conversa_id", str(conversa_id))
+        .order("id", desc=True)
+        .limit(MAX_MENSAGEM_HISTORICO)
+        .execute()
+    )
+    anteriores = list(reversed(resposta.data))
+
+    try:
+        texto = responder(anteriores + [{"role": "user", "content": pedido.content}])
+    except ErroAssistente as erro:
+        #as mensagens do ErroAssistente já foram escritas para o usuário ler
+        raise HTTPException(status_code=503, detail=str(erro))
+
+    #pergunta e resposta são gravadas juntas e só depois de a Ada responder: se ela falhar,
+    #nada fica salvo pela metade e o usuário pode simplesmente tentar de novo
+    gravadas = (
+        usuario.banco.table("mensagens")
+        .insert(
+            [
+                {"conversa_id": str(conversa_id), "role": "user", "content": pedido.content},
+                {"conversa_id": str(conversa_id), "role": "assistant", "content": texto[:LIMITE_CONTEUDO]},
+            ]
+        )
+        .execute()
+    )
+
+    #na primeira pergunta, o título da conversa passa a ser o começo dela
+    titulo = conversa["titulo"]
+    if not anteriores and titulo == TITULO_PADRAO:
+        titulo = _titulo_a_partir_do_texto(pedido.content)
+        usuario.banco.table("conversas").update({"titulo": titulo}).eq("id", str(conversa_id)).execute()
+
+    return {
+        "mensagens": sorted(gravadas.data, key=lambda m: m["id"]),
+        "titulo": titulo,
+    }
