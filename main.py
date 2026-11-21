@@ -2,12 +2,16 @@ import os
 import tempfile
 
 import pandas as pd
+from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from src.autenticacao import UsuarioAtual, usuario_atual
 
+from src.autenticacao import UsuarioAtual, usuario_atual
 from src.conversao import FormatoNaoReconhecido, converter_arquivo, tabela_para_registros
 from src.rotas_conversas import router as rotas_conversas
+
+#lê o .env antes de qualquer outra coisa; no render não há .env e isso não faz nada
+load_dotenv()
 
 #mesmo limite do frontend (50 MB); o servidor confere de novo porque o frontend pode ser burlado
 LIMITE_MB = 50
@@ -31,10 +35,12 @@ app.add_middleware(
 
 app.include_router(rotas_conversas)
 
+
 @app.get("/")
 def status():
     #rota para testar rápido se a api está de pé
     return {"status": "ok"}
+
 
 @app.get("/eu")
 def eu(usuario: UsuarioAtual = Depends(usuario_atual)):
