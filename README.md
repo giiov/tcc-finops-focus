@@ -1,191 +1,119 @@
+# FOCUS Multi-Cloud — API
 
-# ☁️ FOCUS Multi-Cloud
+> API em FastAPI que identifica, converte e analisa dados de custos de computação em nuvem usando o padrão FOCUS.
 
-> Aplicação web para padronização e análise de dados de custos de computação em nuvem, utilizando o padrão FOCUS.
-
----
-
-## 📖 Sobre o projeto
-
-O **FOCUS Multi-Cloud** é uma aplicação desenvolvida como Trabalho de Conclusão de Curso (TCC), orientado pela **Proative**, com foco em FinOps (*Financial Operations*) e na padronização de dados financeiros de ambientes de computação em nuvem.
-
-A ferramenta recebe arquivos CSV de custos de diferentes provedores, identifica automaticamente sua origem e converte os dados para uma estrutura comum baseada no **FOCUS (FinOps Open Cost and Usage Specification)**, padrão mantido pela FinOps Foundation.
-
-Com os dados padronizados, o usuário pode consultar os registros convertidos, visualizar indicadores e gráficos e exportar o resultado para apoiar análises financeiras e processos de Business Intelligence (BI).
-
-> 🚧 **Projeto em desenvolvimento.** Os mapeamentos e as regras de transformação implementados correspondem ao escopo desenvolvido pelo projeto e podem não contemplar todas as informações disponíveis nos arquivos de origem ou toda a especificação FOCUS.
+Este repositório é o **backend** do FOCUS Multi-Cloud. A interface web fica em outro repositório: [tcc-focus-frontend](https://github.com/giiov/tcc-focus-frontend).
 
 ---
 
-## ✦ Como funciona
+## Sobre o projeto
 
-O processamento é organizado em um fluxo de etapas:
+O **FOCUS Multi-Cloud** é uma aplicação desenvolvida como Trabalho de Conclusão de Curso (TCC), com foco em FinOps (*Financial Operations*) e na padronização de dados financeiros de ambientes de computação em nuvem.
 
-`Upload do CSV` → `Detecção do provedor` → `Conversão e tratamento` → `Padronização FOCUS` → `Visualização e exportação`
+A API recebe arquivos CSV de custos de diferentes provedores, identifica a origem de cada arquivo e converte os dados para uma estrutura comum baseada no **FOCUS (FinOps Open Cost and Usage Specification)**, padrão mantido pela FinOps Foundation. Ela também calcula os indicadores usados nos gráficos do frontend e atende a assistente virtual **Ada**.
 
-1. **Entrada:** o usuário envia um arquivo CSV de custos.
-2. **Detecção:** a aplicação identifica o provedor a partir das colunas presentes no arquivo.
-3. **Conversão:** o conversor específico do provedor aplica os mapeamentos e as regras de transformação correspondentes.
-4. **Padronização:** os dados são organizados no schema FOCUS definido pelo projeto.
-5. **Exploração:** os registros convertidos podem ser consultados em tabela, analisados por gráficos e indicadores e exportados em CSV.
+> **Projeto em desenvolvimento.** Os mapeamentos e as regras de transformação correspondem ao escopo desenvolvido pelo projeto e podem não contemplar todas as informações dos arquivos de origem nem toda a especificação FOCUS.
 
 ---
 
-## ☁️ Provedores suportados
+## Como funciona
 
-| Provedor | Colunas de origem mapeadas |
-|----------|---------------------------:|
-| AWS | 15 |
-| Microsoft Azure | 14 |
-| Google Cloud | 11 |
-| Oracle Cloud | 11 |
+`Upload do CSV` → `Detecção do provedor` → `Conversão` → `Schema FOCUS` → `Indicadores`
 
-A saída padronizada segue um schema com 26 colunas FOCUS, sendo 21 obrigatórias e 5 condicionais.
+1. **Entrada:** o frontend envia o CSV para `POST /converter`, já autenticado.
+2. **Detecção:** o provedor é identificado pelas colunas do arquivo. Vence o formato com mais colunas em comum.
+3. **Conversão:** o conversor do provedor aplica os mapeamentos e as regras de transformação.
+4. **Padronização:** os dados ficam no schema FOCUS do projeto.
+5. **Resposta:** a API devolve o formato detectado, o total de linhas, as colunas, uma amostra das primeiras 100 linhas e os indicadores dos gráficos, calculados sobre a tabela inteira.
 
----
+O arquivo é processado em uma pasta temporária e apagado ao fim da requisição. A API não guarda o CSV nem os dados convertidos.
 
-## ✦ O que fazemos?
-
-Dados de custos de diferentes provedores podem apresentar estruturas, nomenclaturas e formatos distintos. O FOCUS Multi-Cloud simplifica esse processo por meio de um fluxo automatizado:
-
-`Entrada` → `Detecção` → `Tratamento` → `Padronização FOCUS` → `Análise`
-
-A proposta é transformar diferentes formatos de dados em uma estrutura comum, facilitando sua utilização em análises de custos e processos de FinOps.
+A documentação interativa de todas as rotas (Swagger) é gerada automaticamente e fica em `/docs`.
 
 ---
 
-### Sobre a assistente Ada
+## Assistente Ada
 
-A Ada utiliza integração com a API do Groq e tem como objetivo esclarecer conceitos e orientar o usuário sobre FinOps, FOCUS e dados de custos em nuvem. Ela não acessa o arquivo enviado nem os dados processados na sessão; suas respostas são baseadas no contexto e nas instruções configuradas para a assistente.
+A Ada usa a API do **Groq** e esclarece conceitos de FinOps, do padrão FOCUS e de dados de custos em nuvem.
 
----
-
-## 📊 Funcionalidades
-
-- Upload e identificação automática de arquivos CSV.
-- Tratamento e padronização de dados de custos cloud.
-- Conversão para o schema FOCUS.
-- Visualização de indicadores e gráficos interativos.
-- Exportação dos dados padronizados.
-- Assistente virtual Ada para dúvidas sobre FinOps e FOCUS.
+- Cada conversa é salva no banco, e a Ada lembra das últimas 10 mensagens.
+- Se o usuário preencheu o perfil (cargo e provedores), ela adapta o nível técnico e os exemplos.
+- Futuramente terá acesso às conversões feitas no site.
 
 ---
 
-## 🖥️ Interface da aplicação
+## Autenticação e banco de dados
 
-A aplicação é organizada em quatro áreas principais:
+O login é feito no frontend com o **Supabase Auth**. A API confere o token de cada requisição e consulta o banco **como aquele usuário**, e as regras de **RLS** (*Row Level Security*) garantem que cada pessoa só veja as próprias conversas e mensagens. Os scripts SQL das tabelas e das regras estão na pasta `db/`.
 
-| Área | Descrição |
+---
+
+## Tecnologias
+
+- **Python** e **FastAPI** (servidor Uvicorn)
+- **Pandas**: leitura e transformação dos CSVs
+- **Supabase**: autenticação e banco PostgreSQL
+- **Groq**: modelo de linguagem da Ada
+- **python-dotenv**: variáveis de ambiente
+
+---
+
+## Configuração
+
+A API está publicada no **Render**. Ela usa estas variáveis de ambiente, definidas no painel do Render ou em um `.env` (veja o `.env.example`):
+
+| Variável | Descrição |
 |---|---|
-| **Início** | Envio do arquivo CSV e acompanhamento do processamento. |
-| **Dados** | Consulta da tabela padronizada, identificação das colunas disponíveis e exportação do CSV. |
-| **Visualizações** | Exibição de indicadores e gráficos gerados a partir dos dados convertidos. |
-| **Sobre** | Apresentação do projeto, do padrão FOCUS e das tecnologias utilizadas. |
+| `GROQ_API_KEY` | Chave da API do Groq. |
+| `GROQ_MODEL` | Modelo do Groq. Opcional. |
+| `SUPABASE_URL` | URL do projeto no Supabase. |
+| `SUPABASE_PUBLISHABLE_KEY` | Chave publishable do Supabase. |
+| `FRONTEND_URLS` | Endereços do frontend liberados no CORS, separados por vírgula. |
 
----
-
-## 🛠️ Tecnologias utilizadas
-
-- **Python** — linguagem principal e lógica de processamento.
-- **Streamlit** — desenvolvimento da interface web.
-- **Pandas** — leitura, tratamento e transformação dos dados.
-- **Plotly** — geração de gráficos interativos.
-- **Groq** — integração utilizada pela assistente virtual Ada.
-- **python-dotenv** — carregamento de variáveis de ambiente.
-
----
-
-## ▶️ Como executar o projeto
-
-### Pré-requisitos
-
-- Python instalado.
-- Git (opcional, para clonar o repositório).
-
-### 1. Clone o repositório
-
-```bash
-git clone https://github.com/giiov/tcc-finops-focus.git
-cd tcc-finops-focus
-```
-
-### 2. Crie e ative um ambiente virtual (recomendado)
-
-No Windows:
-
-```bash
-python -m venv venv
-venv\Scripts\activate
-```
-
-No Linux ou macOS:
-
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-### 3. Instale as dependências
+Para rodar na sua máquina:
 
 ```bash
 pip install -r requirements.txt
+uvicorn main:app --reload
 ```
-
-### 4. Configure a assistente Ada (opcional)
-
-Para utilizar a assistente, crie um arquivo `.env` na raiz do projeto e configure sua chave da API do Groq:
-
-```env
-GROQ_API_KEY=sua_chave_aqui
-```
-
-A variável `GROQ_MODEL` também pode ser definida para selecionar outro modelo compatível. Se ela não for configurada, a aplicação utiliza o modelo padrão definido no código.
-
-### 5. Execute a aplicação
-
-```bash
-streamlit run app_streamlit.py
-```
-
-Após a execução, o Streamlit disponibilizará o endereço local para acessar a aplicação pelo navegador.
 
 ---
 
-## 📁 Estrutura do projeto
+## Estrutura do projeto
 
 ```text
 tcc-finops-focus/
-├── app_streamlit.py
-├── main.py
+├── main.py                 # app FastAPI, CORS e rota /converter
 ├── requirements.txt
-├── data/
-│   └── input/
-├── src/
-│   ├── assistente/
-│   │   ├── ai/
-│   │   └── ui/
-│   ├── converters/
-│   ├── mapping/
-│   ├── schemas/
-│   ├── visualization/
-│   └── logo_nuvem.png
-└── .streamlit/
+├── .env.example
+├── data/input/             # CSVs de exemplo de cada provedor
+├── db/                     # scripts SQL do Supabase (tabelas e RLS)
+└── src/
+    ├── autenticacao.py     # valida o token do usuário
+    ├── conversao.py        # detecta, converte e calcula os indicadores
+    ├── rotas_conversas.py  # rotas das conversas da Ada
+    ├── assistente/ai/      # cliente do Groq, prompt e lógica da Ada
+    ├── converters/         # um conversor por provedor
+    ├── mapping/            # mapeamentos de colunas e detector de provedor
+    ├── schemas/            # schema FOCUS
+    └── visualization/      # legado (versão Streamlit), não usado pela API
 ```
 
 ---
 
-## ⚠️ Escopo e limitações atuais
+## Escopo e limitações atuais
 
-- A entrada de dados pela interface é feita por arquivos **CSV**.
-- A identificação automática considera as colunas presentes no arquivo e os mapeamentos implementados.
-- As transformações seguem regras específicas para cada provedor e o schema FOCUS adotado no projeto.
-- A disponibilidade dos campos depende das informações fornecidas pelo arquivo de origem.
-- A assistente Ada não realiza análise direta do arquivo enviado nem dos dados processados.
-- Integrações diretas com contas de provedores, bancos de dados e outros formatos de arquivo não fazem parte do fluxo atual da aplicação.
+- A entrada de dados é feita por arquivos **CSV**, com limite de 50 MB.
+- A identificação automática considera as colunas do arquivo e os mapeamentos implementados.
+- As transformações seguem regras específicas de cada provedor e o schema FOCUS adotado no projeto.
+- A disponibilidade dos campos depende das informações do arquivo de origem.
+- Os dados convertidos não são armazenados: a API devolve a amostra e os indicadores na própria resposta.
+- A Ada não analisa o arquivo enviado nem os dados processados.
+- Integrações diretas com contas de provedores e outros formatos de arquivo não fazem parte do fluxo atual.
 
 ---
 
-## 👥 Equipe
+## Equipe
 
 | Integrante | Redes |
 |---|---|
