@@ -13,6 +13,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.autenticacao import UsuarioAtual, usuario_atual
 from src.conversao import (
     FormatoNaoReconhecido,
+    colunas_focus_preenchidas,
+    colunas_identificadas,
     converter_arquivo,
     custo_por_categoria,
     custo_por_dia,
@@ -86,6 +88,7 @@ def converter(arquivo: UploadFile = File(...)):
 
         try:
             formato, df_focus = converter_arquivo(caminho)
+            identificadas = colunas_identificadas(caminho, formato)
         except (pd.errors.EmptyDataError, pd.errors.ParserError, UnicodeDecodeError):
             raise HTTPException(status_code=400, detail="Não consegui ler o arquivo como CSV.")
         except FormatoNaoReconhecido:
@@ -95,6 +98,9 @@ def converter(arquivo: UploadFile = File(...)):
         "formato": formato,
         "total_linhas": len(df_focus),
         "colunas": list(df_focus.columns),
+        #colunas do csv original que foram reconhecidas (origem -> FOCUS) e as colunas FOCUS que saíram com valor
+        "colunas_identificadas": identificadas,
+        "colunas_focus_preenchidas": colunas_focus_preenchidas(df_focus),
         "amostra": tabela_para_registros(df_focus, LINHAS_AMOSTRA),
         "graficos": {
             "custo_por_servico": custo_por_servico(df_focus),

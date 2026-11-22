@@ -3,6 +3,10 @@ import json
 import pandas as pd
 
 from src.mapping.detector import detectar_formato
+from src.mapping.aws_mapping import AWS_MAPPING
+from src.mapping.gcp_mapping import GCP_MAPPING
+from src.mapping.azure_mapping import AZURE_MAPPING
+from src.mapping.oracle_mapping import ORACLE_MAPPING
 from src.converters.aws_converter import converter_aws
 from src.converters.gcp_converter import converter_gcp
 from src.converters.azure_converter import converter_azure
@@ -15,6 +19,14 @@ CONVERSORES = {
     "gcp": converter_gcp,
     "azure": converter_azure,
     "oracle": converter_oracle,
+}
+
+#o mapeamento de cada formato: coluna do csv de origem -> coluna FOCUS
+MAPEAMENTOS = {
+    "aws": AWS_MAPPING,
+    "gcp": GCP_MAPPING,
+    "azure": AZURE_MAPPING,
+    "oracle": ORACLE_MAPPING,
 }
 
 
@@ -37,6 +49,19 @@ def converter_arquivo(caminho_arquivo):
 
     df_focus = CONVERSORES[formato](caminho_arquivo)
     return formato, df_focus
+
+
+def colunas_identificadas(caminho_arquivo, formato):
+    #quais colunas do csv original foram reconhecidas e para qual coluna FOCUS cada uma foi
+    #lê só o cabeçalho (nrows=0), então é barato mesmo com o arquivo grande
+    colunas_csv = pd.read_csv(caminho_arquivo, nrows=0).columns
+    mapa = MAPEAMENTOS[formato]
+    return [{"origem": c, "focus": mapa[c]} for c in colunas_csv if c in mapa]
+
+
+def colunas_focus_preenchidas(df_focus):
+    #das colunas FOCUS da saída, quais têm pelo menos um valor (cada provedor preenche colunas diferentes)
+    return [c for c in df_focus.columns if df_focus[c].notna().any()]
 
 
 def tabela_para_registros(df, limite):
