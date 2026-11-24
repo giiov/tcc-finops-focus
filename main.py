@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.autenticacao import UsuarioAtual, usuario_atual
 from src.conversao import FormatoNaoReconhecido, converter_arquivo, tabela_para_registros
 from src.rotas_conversas import router as rotas_conversas
+from src.rotas_conversoes import router as rotas_conversoes
 
 #lê o .env antes de qualquer outra coisa; no render não há .env e isso não faz nada
 load_dotenv()
@@ -34,6 +35,7 @@ app.add_middleware(
 )
 
 app.include_router(rotas_conversas)
+app.include_router(rotas_conversoes)
 
 
 @app.get("/")
