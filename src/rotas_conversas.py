@@ -24,7 +24,11 @@ LIMITE_CONTEUDO = 10000
 #str_strip_whitespace tira os espaços das pontas antes de validar: "   " vira "" e é recusado
 class NovaConversa(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True)
-    titulo: str | None = Field(default=None, min_length=1, max_length=100)
+
+    titulo: str | None = Field(
+        default=None, min_length=1, max_length=100
+    )
+    conversao_id: UUID | None = None
 
 
 class RenomearConversa(BaseModel):
@@ -45,7 +49,7 @@ def listar_conversas(usuario: UsuarioAtual = Depends(usuario_atual)):
     #lista lateral: da conversa com atividade mais recente para a mais antiga
     resposta = (
         usuario.banco.table("conversas")
-        .select("id, titulo, criado_em, atualizado_em")
+        .select("id, titulo, conversao_id, criado_em, atualizado_em")
         .order("atualizado_em", desc=True)
         .execute()
     )
@@ -58,7 +62,35 @@ def criar_conversa(
     usuario: UsuarioAtual = Depends(usuario_atual),
 ):
     titulo = (pedido.titulo if pedido else None) or TITULO_PADRAO
-    resposta = usuario.banco.table("conversas").insert({"titulo": titulo}).execute()
+    conversao_id = pedido.conversao_id if pedido else None
+
+    if conversao_id:
+        # verifica se a conversão existe e pertence ao usuário
+        conversao = (
+            usuario.banco.table("conversoes")
+            .select("id, nome_arquivo")
+            .eq("id", str(conversao_id))
+            .execute()
+        )
+
+        if not conversao.data:
+            raise HTTPException(
+                status_code=404,
+                detail="Conversão não encontrada.",
+            )
+
+        if not pedido.titulo:
+            titulo = f"Análise: {conversao.data[0]['nome_arquivo']}"[:100]
+
+    resposta = (
+        usuario.banco.table("conversas")
+        .insert({
+            "titulo": titulo,
+            "conversao_id": str(conversao_id) if conversao_id else None,
+        })
+        .execute()
+    )
+
     return resposta.data[0]
 
 
