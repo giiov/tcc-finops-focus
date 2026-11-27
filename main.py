@@ -28,6 +28,7 @@ from src.conversao import (
     top_recursos,
 )
 from src.rotas_conversas import router as rotas_conversas
+from src.rotas_conversoes import registrar_conversao, router as rotas_conversoes
 
 #mesmo limite do frontend (50 MB); o servidor confere de novo porque o frontend pode ser burlado
 LIMITE_MB = 50
@@ -50,6 +51,7 @@ app.add_middleware(
 )
 
 app.include_router(rotas_conversas)
+app.include_router(rotas_conversoes)
 
 
 @app.get("/")
@@ -66,8 +68,11 @@ def eu(usuario: UsuarioAtual = Depends(usuario_atual)):
 
 #def comum (e não async def): o pandas é bloqueante, e assim o fastapi roda a função em outra thread
 #sem travar as outras requisições
-@app.post("/converter", dependencies=[Depends(usuario_atual)])
-def converter(arquivo: UploadFile = File(...)):
+@app.post("/converter")
+def converter(
+    arquivo: UploadFile = File(...),
+    usuario: UsuarioAtual = Depends(usuario_atual),
+):
     if not (arquivo.filename or "").lower().endswith(".csv"):
         raise HTTPException(status_code=400, detail="Envie um arquivo com extensão .csv")
 
@@ -94,7 +99,13 @@ def converter(arquivo: UploadFile = File(...)):
         except FormatoNaoReconhecido:
             raise HTTPException(status_code=422, detail="Não foi possível identificar o provedor do arquivo.")
 
+    #o histórico é gravado só depois de a conversão dar certo
+    conversao_id = registrar_conversao(
+        usuario, arquivo.filename, formato, len(df_focus), len(conteudo)
+    )
+
     return {
+        "conversao_id": conversao_id,
         "formato": formato,
         "total_linhas": len(df_focus),
         "colunas": list(df_focus.columns),
